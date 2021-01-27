@@ -1,9 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
+import 'user_model.dart';
 
 class ChannelListView extends StatelessWidget {
+  final User user;
+
+  ChannelListView({Key key, @required this.user}) : super(key: key);
+
   @override
   Widget build(BuildContext context) {
+    print('channel_list_view: user: $user');
     return Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: navigationBar(),
