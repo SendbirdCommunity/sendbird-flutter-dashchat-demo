@@ -9,6 +9,11 @@ Check Flutter status by running in Terminal: `flutter doctor`
 
 Check which devices & emulators are available: `flutter devices`
 
+Platforms Supported:
+- Android
+- iOS
+- Web is **not** yet supported
+  
 ### Android
 
 SETUP:
@@ -30,14 +35,3 @@ flutter clean
 flutter build ios
 ```
 RUNNING: `flutter run -d <device_id>`
-
-### Web
-
-SETUP:
-```
-flutter channel beta
-flutter upgrade
-flutter config --enable-web
-flutter build web
-```
-RUNNING: `flutter run -d chrome`

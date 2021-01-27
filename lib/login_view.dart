@@ -1,20 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-// import 'package:sendbirdsdk/sendbirdsdk.dart';
-// import 'sendbird_state.dart';
+import 'package:sendbirdsdk/sendbirdsdk.dart';
 import 'user_model.dart' as model;
 
 class LoginView extends StatelessWidget {
   final model.User user;
-  // final SendbirdSdk sendbird;
+  final SendbirdSdk sendbird;
   final userIdController = TextEditingController();
   final nickNameController = TextEditingController();
   final imageUrlController = TextEditingController();
 
-  LoginView({Key key, @required this.user}) : super(key: key);
+  // LoginView({Key key, @required this.user}) : super(key: key);
 
-  // LoginView({Key key, @required this.user, @required this.sendbird})
-  //     : super(key: key);
+  LoginView({Key key, @required this.user, @required this.sendbird})
+      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +115,7 @@ class LoginView extends StatelessWidget {
   }
 
   Future<dynamic> connectSendbird(String userId) async {
-    // return await sendbird.connect(userIdController.text);
-    return null;
+    return await sendbird.connect(userIdController.text);
+    // return null;
   }
 }
