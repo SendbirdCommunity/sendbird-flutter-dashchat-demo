@@ -1,15 +1,33 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'user_model.dart';
+import 'user_model.dart' as model;
+import 'package:sendbirdsdk/sendbirdsdk.dart';
 
 class ChannelListView extends StatelessWidget {
-  final User user;
+  final model.User user;
+  final SendbirdSdk sendbird;
 
-  ChannelListView({Key key, @required this.user}) : super(key: key);
+  ChannelListView({Key key, @required this.user, @required this.sendbird})
+      : super(key: key);
+
+  Future<void> test() async {
+    try {
+      final query = GroupChannelListQuery()
+        ..includeEmptyChannel = true
+        ..memberStateFilter = MemberStateFilter.joined
+        ..order = GroupChannelListOrder.latestLastMessage
+        ..limit = 15;
+      final result = await query.loadNext();
+      print('channel_list_view: test: result: $result');
+    } catch (e) {
+      print('channel_list_view: ERROR: $e');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     print('channel_list_view: user: $user');
+    test();
     return Scaffold(
         backgroundColor: Colors.grey[200],
         appBar: navigationBar(),

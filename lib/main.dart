@@ -11,6 +11,7 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
+  final model.User currentUser = model.User();
   final SendbirdSdk sendbird =
       SendbirdSdk(appId: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
 
@@ -22,21 +23,17 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final model.User currentUser = model.User();
-    // final SendbirdSdk sendbird =
-    //     SendbirdSdk(appId: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
-
     return MaterialApp(
         debugShowCheckedModeBanner: false,
         title: 'Flutter Demo',
         initialRoute: initialRoute(),
         routes: <String, WidgetBuilder>{
-          // '/login': (context) => LoginView(user: currentUser),
           '/login': (context) =>
               LoginView(user: currentUser, sendbird: sendbird),
-          '/channel_list': (context) => ChannelListView(user: currentUser),
-          '/create_channel': (context) => CreateChannelView(),
-          '/channel': (context) => ChannelView(),
+          '/channel_list': (context) =>
+              ChannelListView(user: currentUser, sendbird: sendbird),
+          '/create_channel': (context) => CreateChannelView(sendbird: sendbird),
+          '/channel': (context) => ChannelView(sendbird: sendbird),
         });
   }
 }

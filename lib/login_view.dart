@@ -79,23 +79,29 @@ class LoginView extends StatelessWidget {
             onPressed: () {
               // Login with Sendbird
               connectSendbird(userIdController.text).then((value) {
+                print(
+                    'login_view: flat button: sendbird connect response value: $value');
                 if (value == null) {
                   // Failed connection or login
-                  AlertDialog(
-                    title: new Text("Login Error"),
-                    shape: RoundedRectangleBorder(
-                        borderRadius: new BorderRadius.circular(15)),
-                    actions: <Widget>[
-                      new FlatButton(
-                        child: new Text("Ok"),
-                        textColor: Colors.greenAccent,
-                        onPressed: () {
-                          Navigator.pop(context);
-                        },
-                      ),
-                    ],
-                  );
-                  return;
+                  return showDialog<void>(
+                      context: context,
+                      barrierDismissible: true,
+                      builder: (BuildContext context) {
+                        return AlertDialog(
+                          title: new Text("Login Error"),
+                          shape: RoundedRectangleBorder(
+                              borderRadius: new BorderRadius.circular(15)),
+                          actions: <Widget>[
+                            new FlatButton(
+                              child: new Text("Ok"),
+                              textColor: Colors.greenAccent,
+                              onPressed: () {
+                                Navigator.pop(context);
+                              },
+                            ),
+                          ],
+                        );
+                      });
                 }
 
                 user.nickname = nickNameController.text;
@@ -115,7 +121,12 @@ class LoginView extends StatelessWidget {
   }
 
   Future<dynamic> connectSendbird(String userId) async {
-    return await sendbird.connect(userIdController.text);
-    // return null;
+    try {
+      var result = await sendbird.connect(userIdController.text);
+      return result;
+    } catch (e) {
+      print('login_view: connectSendbird: ERROR: $e');
+      return null;
+    }
   }
 }
