@@ -2,8 +2,6 @@ import 'package:flutter/material.dart';
 import 'login_view.dart';
 import 'channel_list_view.dart';
 import 'create_channel_view.dart';
-import 'channel_view.dart';
-import 'user_model.dart' as model;
 import 'package:sendbirdsdk/sendbirdsdk.dart';
 
 void main() {
@@ -11,10 +9,6 @@ void main() {
 }
 
 class MyApp extends StatelessWidget {
-  final model.User currentUser = model.User();
-  final SendbirdSdk sendbird =
-      SendbirdSdk(appId: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
-
   String initialRoute() {
     // TODO: Switch initial view between login or channel list, depending on prior
     // login state.
@@ -28,12 +22,10 @@ class MyApp extends StatelessWidget {
         title: 'Flutter Demo',
         initialRoute: initialRoute(),
         routes: <String, WidgetBuilder>{
-          '/login': (context) =>
-              LoginView(user: currentUser, sendbird: sendbird),
-          '/channel_list': (context) =>
-              ChannelListView(user: currentUser, sendbird: sendbird),
-          '/create_channel': (context) => CreateChannelView(sendbird: sendbird),
-          '/channel': (context) => ChannelView(sendbird: sendbird),
+          '/login': (context) => LoginView(),
+          '/channel_list': (context) => ChannelListView(),
+          '/create_channel': (context) => CreateChannelView(),
+          // '/channel': (context) => ChannelView(),
         });
   }
 }

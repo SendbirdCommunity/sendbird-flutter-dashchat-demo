@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart';
-import 'user_model.dart' as model;
 
 class CreateChannelView extends StatefulWidget {
-  final SendbirdSdk sendbird;
-
-  CreateChannelView({Key key, @required this.sendbird}) : super(key: key);
   @override
   _CreateChannelViewState createState() => _CreateChannelViewState();
 }
@@ -99,10 +95,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
               itemBuilder: (context, index) {
                 UserSelection selection = selections[index];
                 User user = selection.user;
-                if (user == null) {
-                  print('create_channel_view: body: selection: $selection');
-                  return ListTile(title: Text('<User with no nickname>'));
-                }
+
                 return CheckboxListTile(
                     tileColor: Colors.purple,
                     title: Text("${selection.user.nickname}",

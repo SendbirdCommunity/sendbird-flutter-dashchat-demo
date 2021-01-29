@@ -1,15 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'user_model.dart' as model;
 import 'package:sendbirdsdk/sendbirdsdk.dart';
+import 'group_channel_view.dart';
 
 class ChannelListView extends StatefulWidget {
-  final model.User user;
-  final SendbirdSdk sendbird;
-
-  ChannelListView({Key key, @required this.user, @required this.sendbird})
-      : super(key: key);
-
   @override
   _ChannelListViewState createState() => _ChannelListViewState();
 }
@@ -49,7 +43,6 @@ class _ChannelListViewState extends State<ChannelListView> {
 
   @override
   Widget build(BuildContext context) {
-    print('channel_list_view: user: ${widget.user}');
     print('channel_list_view: groupChannels: $groupChannels');
     return Scaffold(
         backgroundColor: Colors.grey[200],
@@ -93,21 +86,33 @@ class _ChannelListViewState extends State<ChannelListView> {
                     itemCount: groupChannels.length,
                     itemBuilder: (context, index) {
                       GroupChannel channel = groupChannels[index];
-                      String channelName = channel.name != ""
-                          ? channel.name
-                          : "<unnamed_channel>";
+                      String name = [
+                        for (final member in channel.members) member.nickname
+                      ].toString();
                       return ListTile(
                           tileColor: Colors.purple,
-                          title: Text(
-                              "Name: $channelName Members:${channel.memberCount}",
-                              style: TextStyle(color: Colors.white)),
+                          title:
+                              Text(name, style: TextStyle(color: Colors.white)),
                           onTap: () {
-                            //Display chat view
-                            Navigator.pushNamed(context, '/channel');
+                            gotoChannel(channel.channelUrl);
                           });
                     }))
             : Center(child: CircularProgressIndicator())
       ],
     );
+  }
+
+  void gotoChannel(String channelUrl) {
+    GroupChannel.getChannel(channelUrl).then((channel) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => GroupChannelView(groupChannel: channel),
+        ),
+      );
+    }).catchError((e) {
+      //handle error
+      print('channel_list_view: gotoChannel: ERROR: $e');
+    });
   }
 }
