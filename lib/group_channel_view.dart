@@ -102,10 +102,8 @@ class _GroupChannelViewState extends State<GroupChannelView>
           },
           sendOnEnter: true,
           textInputAction: TextInputAction.send,
-          // messages: [ChatMessage(user: user, text: "test")],
           user: user,
           messages: asDashChatMessages(_messages),
-          // user: asDashChatUser(SendbirdSdk().getCurrentUser()),
           inputDecoration:
               InputDecoration.collapsed(hintText: "Type a message here..."),
         ),
