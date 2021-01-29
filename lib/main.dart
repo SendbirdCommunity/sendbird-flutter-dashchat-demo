@@ -3,7 +3,6 @@ import 'login_view.dart';
 import 'channel_list_view.dart';
 import 'create_channel_view.dart';
 import 'channel_view.dart';
-import 'package:sendbirdsdk/sendbirdsdk.dart';
 
 void main() {
   runApp(MyApp());
