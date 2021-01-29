@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'user_model.dart' as model;
 import 'package:sendbirdsdk/sendbirdsdk.dart';
 
 class ChannelListView extends StatelessWidget {
-  final model.User user;
-  final SendbirdSdk sendbird;
-
-  ChannelListView({Key key, @required this.user, @required this.sendbird})
-      : super(key: key);
+  final SendbirdSdk sendbird = SendbirdSdk();
 
   Future<void> test() async {
     try {
@@ -26,7 +21,7 @@ class ChannelListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    print('channel_list_view: user: $user');
+    // print('channel_list_view: user: $user');
     test();
     return Scaffold(
         backgroundColor: Colors.grey[200],

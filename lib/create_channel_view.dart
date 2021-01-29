@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart';
-import 'user_model.dart' as model;
 
 class CreateChannelView extends StatelessWidget {
-  final SendbirdSdk sendbird;
-
-  CreateChannelView({Key key, @required this.sendbird}) : super(key: key);
+  final SendbirdSdk sendbird = SendbirdSdk();
 
   @override
   Widget build(BuildContext context) {

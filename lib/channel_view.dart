@@ -6,12 +6,11 @@ import 'dart:async';
 import 'dart:io';
 import 'package:intl/intl.dart';
 import 'package:dash_chat/dash_chat.dart';
-import 'user_model.dart' as model;
 
 class ChannelView extends StatefulWidget {
-  final SendbirdSdk sendbird;
+  final SendbirdSdk sendbird = SendbirdSdk();
 
-  ChannelView({Key key, @required this.sendbird}) : super(key: key);
+  ChannelView({Key key}) : super(key: key);
 
   @override
   _ChannelViewState createState() => _ChannelViewState();

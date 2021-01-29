@@ -1,19 +1,14 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart';
-import 'user_model.dart' as model;
 
 class LoginView extends StatelessWidget {
-  final model.User user;
-  final SendbirdSdk sendbird;
+  final appIdController =
+      TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
   final userIdController = TextEditingController();
   final nicknameController = TextEditingController();
-  final profileUrlController = TextEditingController();
-
-  // LoginView({Key key, @required this.user}) : super(key: key);
-
-  LoginView({Key key, @required this.user, @required this.sendbird})
-      : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -47,6 +42,13 @@ class LoginView extends StatelessWidget {
     return Column(
       children: [
         TextField(
+          controller: appIdController,
+          decoration: InputDecoration(
+            icon: Icon(Icons.account_circle),
+            labelText: 'App Id',
+          ),
+        ),
+        TextField(
           controller: userIdController,
           decoration: InputDecoration(
             icon: Icon(Icons.account_circle),
@@ -60,15 +62,8 @@ class LoginView extends StatelessWidget {
             labelText: 'Nickname',
           ),
         ),
-        TextField(
-          controller: profileUrlController,
-          decoration: InputDecoration(
-            icon: Icon(Icons.account_circle),
-            labelText: 'Profile Image Url',
-          ),
-        ),
+        // TODO Add profile image url
         Center(
-          // TODO: TextFields here
           child: FlatButton(
             color: Colors.blue,
             textColor: Colors.white,
@@ -78,34 +73,30 @@ class LoginView extends StatelessWidget {
             splashColor: Colors.blueAccent,
             onPressed: () {
               // Login with Sendbird
-              connect(userIdController.text).then((value) {
-                if (value == null) {
-                  // Failed connection or login
-                  return showDialog<void>(
-                      context: context,
-                      barrierDismissible: true,
-                      builder: (BuildContext context) {
-                        return AlertDialog(
-                          title: new Text("Login Error"),
-                          shape: RoundedRectangleBorder(
-                              borderRadius: new BorderRadius.circular(15)),
-                          actions: <Widget>[
-                            new FlatButton(
-                              child: new Text("Ok"),
-                              textColor: Colors.greenAccent,
-                              onPressed: () {
-                                Navigator.pop(context);
-                              },
-                            ),
-                          ],
-                        );
-                      });
-                }
-
-                user.nickname = nicknameController.text;
-                user.userId = userIdController.text;
-                user.imageUrl = profileUrlController.text;
+              connect(appIdController.text, userIdController.text,
+                      nicknameController.text)
+                  .then((user) {
                 Navigator.pushNamed(context, '/channel_list');
+              }).catchError((error) {
+                return showDialog<void>(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: new Text("Login Error: $error"),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(15)),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text("Ok"),
+                            textColor: Colors.greenAccent,
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    });
               });
             },
             child: Text(
@@ -118,13 +109,15 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Future<dynamic> connect(String userId) async {
+  Future<User> connect(String appId, String userId, String nickname) async {
     try {
-      var result = await sendbird.connect(userIdController.text);
-      return result;
-    } catch (e) {
-      print('login_view: connectSendbird: ERROR: $e');
-      return null;
+      final sendbird = SendbirdSdk(appId: appId);
+      final user = await sendbird.connect(userId);
+      // TODO update nickname
+      return user;
+    } catch (error) {
+      print('login_view: connect: ERROR: $error');
+      throw error;
     }
   }
 }
