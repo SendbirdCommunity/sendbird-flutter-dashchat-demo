@@ -116,15 +116,23 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Future<dynamic> connect(
+  Future<sb.User> connect(
       String appId, String userId, String nickname, String profileUrl) async {
     try {
       final sendbird = sb.SendbirdSdk(appId: appId);
       final user = await sendbird.connect(userId);
-      if (nickname != null && user.nickname != nickname) {
-        final imageInfo = sb.ImageInfo.fromUrl(url: profileUrl);
+
+      final shouldUpdateNickname = nickname != '' && user.nickname != nickname;
+      final shouldUpdateProfileUrl =
+          profileUrl != '' && user.profileUrl != profileUrl;
+
+      if (shouldUpdateNickname || shouldUpdateProfileUrl) {
+        final imageInfo = sb.ImageInfo.fromUrl(
+            url: shouldUpdateProfileUrl ? profileUrl : user.profileUrl);
         await sendbird.updateCurrentUserInfo(
-            nickname: nickname, imageInfo: imageInfo, preferredLanguages: []);
+            nickname: shouldUpdateNickname ? nickname : user.nickname,
+            imageInfo: imageInfo,
+            preferredLanguages: []);
       }
       return user;
     } catch (error) {
