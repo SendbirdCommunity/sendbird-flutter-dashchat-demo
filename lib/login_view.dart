@@ -14,7 +14,7 @@ class LoginView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       appBar: navigationBar(),
       body: body(context),
     );
@@ -27,14 +27,8 @@ class LoginView extends StatelessWidget {
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
-      title: Text('Login', style: TextStyle(color: Colors.black)),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.more_vert),
-          color: Colors.black,
-          onPressed: () {},
-        )
-      ],
+      title: Text('Sendbird Sample', style: TextStyle(color: Colors.black)),
+      actions: [],
       centerTitle: true,
     );
   }
@@ -70,14 +64,14 @@ class LoginView extends StatelessWidget {
             labelText: 'Profile Image Url',
           ),
         ),
-        Center(
+        FractionallySizedBox(
+          widthFactor: 0.9,
           child: FlatButton(
-            color: Colors.blue,
+            color: Theme.of(context).primaryColor,
             textColor: Colors.white,
             disabledColor: Colors.grey,
             disabledTextColor: Colors.black,
             padding: EdgeInsets.all(8.0),
-            splashColor: Colors.blueAccent,
             onPressed: () {
               // Login with Sendbird
               connect(appIdController.text, userIdController.text,
