@@ -25,7 +25,6 @@ class MyApp extends StatelessWidget {
           '/login': (context) => LoginView(),
           '/channel_list': (context) => ChannelListView(),
           '/create_channel': (context) => CreateChannelView(),
-          // '/channel': (context) => ChannelView(),
         });
   }
 }

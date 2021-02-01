@@ -2,13 +2,14 @@ import 'dart:async';
 
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:sendbirdsdk/sendbirdsdk.dart';
+import 'package:sendbirdsdk/sendbirdsdk.dart' as sb;
 
 class LoginView extends StatelessWidget {
   final appIdController =
-      TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
+      TextEditingController(text: "7A493E5B-B92F-4D01-AD41-7F568AA2AECA");
   final userIdController = TextEditingController();
   final nicknameController = TextEditingController();
+  final profileUrlController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
@@ -62,7 +63,13 @@ class LoginView extends StatelessWidget {
             labelText: 'Nickname',
           ),
         ),
-        // TODO Add profile image url
+        TextField(
+          controller: profileUrlController,
+          decoration: InputDecoration(
+            icon: Icon(Icons.account_circle),
+            labelText: 'Profile Image Url',
+          ),
+        ),
         Center(
           child: FlatButton(
             color: Colors.blue,
@@ -74,7 +81,7 @@ class LoginView extends StatelessWidget {
             onPressed: () {
               // Login with Sendbird
               connect(appIdController.text, userIdController.text,
-                      nicknameController.text)
+                      nicknameController.text, profileUrlController.text)
                   .then((user) {
                 Navigator.pushNamed(context, '/channel_list');
               }).catchError((error) {
@@ -109,11 +116,24 @@ class LoginView extends StatelessWidget {
     );
   }
 
-  Future<User> connect(String appId, String userId, String nickname) async {
+  Future<sb.User> connect(
+      String appId, String userId, String nickname, String profileUrl) async {
     try {
-      final sendbird = SendbirdSdk(appId: appId);
+      final sendbird = sb.SendbirdSdk(appId: appId);
       final user = await sendbird.connect(userId);
-      // TODO update nickname
+
+      final shouldUpdateNickname = nickname != '' && user.nickname != nickname;
+      final shouldUpdateProfileUrl =
+          profileUrl != '' && user.profileUrl != profileUrl;
+
+      if (shouldUpdateNickname || shouldUpdateProfileUrl) {
+        final imageInfo = sb.ImageInfo.fromUrl(
+            url: shouldUpdateProfileUrl ? profileUrl : user.profileUrl);
+        await sendbird.updateCurrentUserInfo(
+            nickname: shouldUpdateNickname ? nickname : user.nickname,
+            imageInfo: imageInfo,
+            preferredLanguages: []);
+      }
       return user;
     } catch (error) {
       print('login_view: connect: ERROR: $error');
