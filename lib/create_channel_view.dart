@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_demo/group_channel_view.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart';
 
@@ -47,6 +48,23 @@ class _CreateChannelViewState extends State<CreateChannelView> {
     } catch (e) {
       print('create_channel_view: getUsers: ERROR: $e');
       return [];
+    }
+  }
+
+  Future<GroupChannel> createChannel() async {
+    try {
+      final userIds = this
+          .selections
+          .where((selection) => selection.isSelected)
+          .map((selection) {
+        return selection.user.userId;
+      }).toList();
+      final params = GroupChannelParams()..userIds = userIds;
+      final channel = await GroupChannel.createChannel(params);
+      return channel;
+    } catch (e) {
+      print('create_channel_view: createChannel: ERROR: $e');
+      throw e;
     }
   }
 
@@ -119,9 +137,35 @@ class _CreateChannelViewState extends State<CreateChannelView> {
             padding: EdgeInsets.all(8.0),
             splashColor: Colors.blueAccent,
             onPressed: () {
-              // TODO:
-              // Create channel with just selected users
-              Navigator.pushNamed(context, '/channel');
+              createChannel().then((channel) {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) =>
+                        GroupChannelView(groupChannel: channel),
+                  ),
+                );
+              }).catchError((error) {
+                return showDialog<void>(
+                    context: context,
+                    barrierDismissible: true,
+                    builder: (BuildContext context) {
+                      return AlertDialog(
+                        title: new Text("Channel Creation Error: $error"),
+                        shape: RoundedRectangleBorder(
+                            borderRadius: new BorderRadius.circular(15)),
+                        actions: <Widget>[
+                          new FlatButton(
+                            child: new Text("Ok"),
+                            textColor: Colors.greenAccent,
+                            onPressed: () {
+                              Navigator.pop(context);
+                            },
+                          ),
+                        ],
+                      );
+                    });
+              });
             },
             child: Text(
               "Create",
