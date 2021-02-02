@@ -13,7 +13,6 @@ class LoginView extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      appBar: navigationBar(),
       body: body(context),
     );
   }
@@ -36,6 +35,16 @@ class LoginView extends StatelessWidget {
         padding: EdgeInsets.all(20),
         child: Column(
           children: [
+            Container(
+                padding: EdgeInsets.all(40),
+                child: Column(
+                  children: [
+                    Image(
+                      image: AssetImage('assets/logoSendbird@3x.png'),
+                    ),
+                    Text('Sendbird Sample')
+                  ],
+                )),
             TextField(
               controller: appIdController,
               decoration: InputDecoration(
@@ -55,7 +64,6 @@ class LoginView extends StatelessWidget {
                 textColor: Colors.white,
                 disabledColor: Colors.grey,
                 disabledTextColor: Colors.black,
-                padding: EdgeInsets.all(8.0),
                 onPressed: () {
                   // Login with Sendbird
                   connect(appIdController.text, userIdController.text)
