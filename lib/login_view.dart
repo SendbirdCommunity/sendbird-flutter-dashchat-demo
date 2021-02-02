@@ -116,9 +116,10 @@ class LoginView extends StatelessWidget {
       final sendbird = sb.SendbirdSdk(appId: appId);
       final user = await sendbird.connect(userId);
 
-      final shouldUpdateNickname = nickname != '' && user.nickname != nickname;
+      final shouldUpdateNickname =
+          nickname.isNotEmpty && user.nickname != nickname;
       final shouldUpdateProfileUrl =
-          profileUrl != '' && user.profileUrl != profileUrl;
+          profileUrl.isNotEmpty && user.profileUrl != profileUrl;
 
       if (shouldUpdateNickname || shouldUpdateProfileUrl) {
         final imageInfo = sb.ImageInfo.fromUrl(
