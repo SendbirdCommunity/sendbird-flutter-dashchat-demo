@@ -98,10 +98,15 @@ class _CreateChannelViewState extends State<CreateChannelView> {
 
                 return CheckboxListTile(
                   tileColor: Colors.white,
-                  title: Text("${selection.user.nickname}",
+                  title: Text(
+                      selection.user.nickname.isEmpty
+                          ? selection.user.userId
+                          : selection.user.nickname,
                       style: TextStyle(color: Colors.black)),
                   controlAffinity: ListTileControlAffinity.platform,
-                  value: selection.isSelected,
+                  value: SendbirdSdk().getCurrentUser().userId ==
+                          selection.user.userId ||
+                      selection.isSelected,
                   activeColor: Theme.of(context).primaryColor,
                   onChanged: (bool value) {
                     //Display chat view
