@@ -101,6 +101,9 @@ class _GroupChannelViewState extends State<GroupChannelView>
     return Column(children: [
       Expanded(
         child: DashChat(
+          dateFormat: DateFormat("E, MMM d"),
+          // timeFormat: DateFormat('HH:mm'),
+          timeFormat: DateFormat.jm(),
           showUserAvatar: true,
           onPressAvatar: (ChatUser user) {
             // If wanting to trigger anything from here
@@ -140,6 +143,7 @@ class _GroupChannelViewState extends State<GroupChannelView>
     messages.forEach((message) {
       User user = message.sender;
       result.add(ChatMessage(
+          createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
           text: message.message,
           user: ChatUser(
               name: user.nickname, uid: user.userId, avatar: user.profileUrl)));
