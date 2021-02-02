@@ -32,19 +32,18 @@ class LoginView extends StatelessWidget {
 
   Widget body(BuildContext context) {
     return Container(
-        padding: EdgeInsets.all(20),
+        padding: EdgeInsets.only(left: 20, right: 20, top: 100),
         child: Column(
           children: [
             Container(
-                padding: EdgeInsets.all(40),
-                child: Column(
-                  children: [
-                    Image(
-                      image: AssetImage('assets/logoSendbird@3x.png'),
-                    ),
-                    Text('Sendbird Sample')
-                  ],
+                width: 70,
+                height: 70,
+                child: Image(
+                  image: AssetImage('assets/logoSendbird@3x.png'),
+                  fit: BoxFit.scaleDown,
                 )),
+            Text('Sendbird Sample',
+                style: Theme.of(context).textTheme.headline6),
             TextField(
               controller: appIdController,
               decoration: InputDecoration(
@@ -58,7 +57,7 @@ class LoginView extends StatelessWidget {
               ),
             ),
             FractionallySizedBox(
-              widthFactor: 0.9,
+              widthFactor: 1,
               child: FlatButton(
                 color: Theme.of(context).buttonColor,
                 textColor: Colors.white,
