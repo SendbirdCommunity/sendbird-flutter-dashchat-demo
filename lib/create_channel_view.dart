@@ -67,7 +67,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
 
   Widget navigationBar() {
     return AppBar(
-      leading: BackButton(color: Color(0xff742DDD)),
+      leading: BackButton(color: Theme.of(context).buttonColor),
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
@@ -77,7 +77,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
       actions: [
         IconButton(
           icon: Icon(Icons.more_vert),
-          color: Color(0xff742DDD),
+          color: Theme.of(context).buttonColor,
           onPressed: () {},
         )
       ],
