@@ -47,14 +47,24 @@ class LoginView extends StatelessWidget {
             TextField(
               controller: appIdController,
               decoration: InputDecoration(
-                labelText: 'App Id',
-              ),
+                  labelText: 'App Id',
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      appIdController.clear();
+                    },
+                    icon: Icon(Icons.clear),
+                  )),
             ),
             TextField(
               controller: userIdController,
               decoration: InputDecoration(
-                labelText: 'User Id',
-              ),
+                  labelText: 'User Id',
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      userIdController.clear();
+                    },
+                    icon: Icon(Icons.clear),
+                  )),
             ),
             FractionallySizedBox(
               widthFactor: 1,
