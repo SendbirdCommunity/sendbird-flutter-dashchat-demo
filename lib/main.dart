@@ -27,8 +27,8 @@ class MyApp extends StatelessWidget {
           '/create_channel': (context) => CreateChannelView(),
         },
         theme: ThemeData(
-          primaryColor: Color.fromRGBO(130, 94, 235, 1),
-          buttonColor: Color.fromRGBO(130, 94, 235, 1),
+          primaryColor: Color.fromRGBO(116, 45, 221, 1),
+          buttonColor: Color.fromRGBO(116, 45, 221, 1),
         ));
   }
 }
