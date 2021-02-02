@@ -32,6 +32,6 @@ class MyApp extends StatelessWidget {
             textSelectionTheme: TextSelectionThemeData(
                 cursorColor: Color.fromRGBO(116, 45, 221, 1),
                 selectionHandleColor: Color.fromRGBO(116, 45, 221, 1),
-                selectionColor: Color.fromRGBO(116, 45, 221, 1))));
+                selectionColor: Color.fromRGBO(116, 45, 221, 0.3))));
   }
 }
