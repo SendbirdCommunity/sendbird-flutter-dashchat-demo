@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart';
 import 'group_channel_view.dart';
+import 'package:intl/intl.dart';
 
 class ChannelListView extends StatefulWidget {
   @override
@@ -72,12 +73,36 @@ class _ChannelListViewState extends State<ChannelListView> {
   }
 
   String titleFrom(GroupChannel channel, User currentUser) {
-    String currentUserName = SendbirdSdk().getCurrentUser().nickname;
+    // List of channel member names, excluding the current user
     List<String> namesList = [
-      for (final member in channel.members) member.nickname
+      for (final member in channel.members)
+        if (member.userId != currentUser.userId) member.nickname
     ];
-    namesList.remove(currentUserName);
     return namesList.join(", ");
+  }
+
+  Widget avatarsFrom(GroupChannel channel, User currentUser) {
+    // Generate a channel image from avatars of users, excluding current user
+    return Container(
+      width: 40,
+      height: 40,
+      child: RawMaterialButton(
+        shape: CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        onPressed: () {},
+        child: GridView.count(
+            crossAxisCount: (channel.memberCount / 2).round(),
+            children: [
+              for (final member in channel.members)
+                if (member.userId != currentUser.userId &&
+                    member.profileUrl != null)
+                  Image(image: NetworkImage(member.profileUrl))
+              // CircleAvatar(
+              //     backgroundImage: NetworkImage(member.profileUrl),
+              //     backgroundColor: Colors.grey)
+            ]),
+      ),
+    );
   }
 
   Widget body(BuildContext context) {
@@ -86,27 +111,56 @@ class _ChannelListViewState extends State<ChannelListView> {
         // TODO: ListView here
         groupChannels.length != 0
             ? Expanded(
-                child: ListView.separated(
-                    separatorBuilder: (context, index) => Divider(
-                          color: Colors.black,
-                        ),
-                    // child: ListView.builder(
+                child: ListView.builder(
                     itemCount: groupChannels.length,
                     itemBuilder: (context, index) {
                       GroupChannel channel = groupChannels[index];
+                      DateTime lastMessageDate =
+                          DateTime.fromMillisecondsSinceEpoch(
+                              channel.lastMessage.createdAt);
+                      String lastMessageDateString =
+                          DateFormat("E").format(lastMessageDate);
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
                         child: ListTile(
-                            tileColor: Colors.white,
-                            // horizontalTitleGap: 10,
-                            // minVerticalPadding: 10,
-                            title: Text(
-                                titleFrom(
-                                    channel, SendbirdSdk().getCurrentUser()),
-                                style: TextStyle(color: Colors.black)),
-                            onTap: () {
-                              gotoChannel(channel.channelUrl);
-                            }),
+                          leading: avatarsFrom(
+                              channel, SendbirdSdk().getCurrentUser()),
+                          tileColor: Colors.white,
+                          title: Text(
+                              titleFrom(
+                                  channel, SendbirdSdk().getCurrentUser()),
+                              style: TextStyle(color: Colors.black)),
+                          subtitle: Text(channel.lastMessage.message),
+                          onTap: () {
+                            gotoChannel(channel.channelUrl);
+                          },
+                          trailing: Column(
+                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                            children: [
+                              Text(lastMessageDateString),
+                              ConstrainedBox(
+                                constraints:
+                                    BoxConstraints(maxHeight: 20, maxWidth: 40),
+                                child: TextField(
+                                  textAlign: TextAlign.center,
+                                  enabled: false,
+                                  enableInteractiveSelection: false,
+                                  decoration: new InputDecoration(
+                                      border: new OutlineInputBorder(
+                                        borderRadius: const BorderRadius.all(
+                                          const Radius.circular(20.0),
+                                        ),
+                                      ),
+                                      filled: true,
+                                      hintStyle: new TextStyle(
+                                          color: Colors.white, fontSize: 8),
+                                      hintText: "${channel.unreadMessageCount}",
+                                      fillColor: Color(0xff742DDD)),
+                                ),
+                              ),
+                            ],
+                          ),
+                        ),
                       );
                     }))
             : Center(child: CircularProgressIndicator())
