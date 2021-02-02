@@ -9,7 +9,6 @@ import 'package:dash_chat/dash_chat.dart';
 
 class GroupChannelView extends StatefulWidget {
   GroupChannel groupChannel;
-
   GroupChannelView({Key key, @required this.groupChannel}) : super(key: key);
 
   @override
@@ -61,12 +60,21 @@ class _GroupChannelViewState extends State<GroupChannelView>
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: navigationBar(),
+      appBar: navigationBar(widget.groupChannel),
       body: body(context),
     );
   }
 
-  Widget navigationBar() {
+  String titleFrom(GroupChannel channel, User currentUser) {
+    String currentUserName = SendbirdSdk().getCurrentUser().nickname;
+    List<String> namesList = [
+      for (final member in channel.members) member.nickname
+    ];
+    namesList.remove(currentUserName);
+    return namesList.join(", ");
+  }
+
+  Widget navigationBar(GroupChannel channel) {
     return AppBar(
       leading: BackButton(color: Color(0xff742DDD)),
       toolbarHeight: 65,
@@ -74,7 +82,8 @@ class _GroupChannelViewState extends State<GroupChannelView>
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
-      title: Text('Channel List View', style: TextStyle(color: Colors.black)),
+      title: Text(titleFrom(channel, SendbirdSdk().getCurrentUser()),
+          style: TextStyle(color: Colors.black)),
       actions: [
         IconButton(
           icon: Icon(Icons.more_vert),
@@ -106,6 +115,17 @@ class _GroupChannelViewState extends State<GroupChannelView>
           messages: asDashChatMessages(_messages),
           inputDecoration:
               InputDecoration.collapsed(hintText: "Type a message here..."),
+          // Image button
+          // trailing: <Widget>[
+          //   Container(
+          //       width: 40,
+          //       child: TextButton(child: Icon(Icons.photo), onPressed: () {})),
+          //   // IconButton(icon: Icon(Icons.photo), onPressed: () {}),
+          // ],
+          //
+          // Not really sure how to return a custom widget to this arg.
+          // sendButtonBuilder:
+          //     TextButton(child: Icon(Icons.photo), onPressed: () {}),
         ),
       ),
       // Spacer for devices with no home button

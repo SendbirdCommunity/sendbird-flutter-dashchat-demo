@@ -76,6 +76,15 @@ class _ChannelListViewState extends State<ChannelListView> {
     );
   }
 
+  String titleFrom(GroupChannel channel, User currentUser) {
+    String currentUserName = SendbirdSdk().getCurrentUser().nickname;
+    List<String> namesList = [
+      for (final member in channel.members) member.nickname
+    ];
+    namesList.remove(currentUserName);
+    return namesList.join(", ");
+  }
+
   Widget body(BuildContext context) {
     return Column(
       children: [
@@ -86,13 +95,12 @@ class _ChannelListViewState extends State<ChannelListView> {
                     itemCount: groupChannels.length,
                     itemBuilder: (context, index) {
                       GroupChannel channel = groupChannels[index];
-                      String name = [
-                        for (final member in channel.members) member.nickname
-                      ].toString();
                       return ListTile(
                           tileColor: Colors.purple,
-                          title:
-                              Text(name, style: TextStyle(color: Colors.white)),
+                          title: Text(
+                              titleFrom(
+                                  channel, SendbirdSdk().getCurrentUser()),
+                              style: TextStyle(color: Colors.white)),
                           onTap: () {
                             gotoChannel(channel.channelUrl);
                           });

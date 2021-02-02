@@ -6,7 +6,7 @@ import 'package:sendbirdsdk/sendbirdsdk.dart' as sb;
 
 class LoginView extends StatelessWidget {
   final appIdController =
-      TextEditingController(text: "7A493E5B-B92F-4D01-AD41-7F568AA2AECA");
+      TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
   final userIdController = TextEditingController();
   final nicknameController = TextEditingController();
   final profileUrlController = TextEditingController();
