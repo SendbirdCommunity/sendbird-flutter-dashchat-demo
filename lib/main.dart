@@ -18,15 +18,17 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      title: 'Flutter Demo',
-      initialRoute: initialRoute(),
-      routes: <String, WidgetBuilder>{
-        '/login': (context) => LoginView(),
-        '/channel_list': (context) => ChannelListView(),
-        '/create_channel': (context) => CreateChannelView(),
-      },
-      theme: ThemeData(primaryColor: Color.fromRGBO(130, 94, 235, 1)),
-    );
+        debugShowCheckedModeBanner: false,
+        title: 'Flutter Demo',
+        initialRoute: initialRoute(),
+        routes: <String, WidgetBuilder>{
+          '/login': (context) => LoginView(),
+          '/channel_list': (context) => ChannelListView(),
+          '/create_channel': (context) => CreateChannelView(),
+        },
+        theme: ThemeData(
+          primaryColor: Color.fromRGBO(130, 94, 235, 1),
+          buttonColor: Color.fromRGBO(130, 94, 235, 1),
+        ));
   }
 }

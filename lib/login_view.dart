@@ -67,7 +67,7 @@ class LoginView extends StatelessWidget {
         FractionallySizedBox(
           widthFactor: 0.9,
           child: FlatButton(
-            color: Theme.of(context).primaryColor,
+            color: Theme.of(context).buttonColor,
             textColor: Colors.white,
             disabledColor: Colors.grey,
             disabledTextColor: Colors.black,
