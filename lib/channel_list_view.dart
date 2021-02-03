@@ -129,7 +129,9 @@ class _ChannelListViewState extends State<ChannelListView> {
                           title: Text(
                               titleFrom(
                                   channel, SendbirdSdk().getCurrentUser()),
-                              style: TextStyle(color: Colors.black)),
+                              style: TextStyle(
+                                  color: Colors.black,
+                                  fontWeight: FontWeight.bold)),
                           subtitle: Text(channel.lastMessage.message),
                           onTap: () {
                             gotoChannel(channel.channelUrl);

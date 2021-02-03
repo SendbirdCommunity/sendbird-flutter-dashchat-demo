@@ -76,18 +76,18 @@ class _GroupChannelViewState extends State<GroupChannelView>
 
   Widget navigationBar(GroupChannel channel) {
     return AppBar(
-      leading: BackButton(color: Color(0xff742DDD)),
+      leading: BackButton(color: Theme.of(context).buttonColor),
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
       title: Text(titleFrom(channel, SendbirdSdk().getCurrentUser()),
-          style: TextStyle(color: Colors.black)),
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
       actions: [
         IconButton(
           icon: Icon(Icons.more_vert),
-          color: Color(0xff742DDD),
+          color: Theme.of(context).buttonColor,
           onPressed: () {},
         )
       ],
@@ -118,17 +118,14 @@ class _GroupChannelViewState extends State<GroupChannelView>
           messages: asDashChatMessages(_messages),
           inputDecoration:
               InputDecoration.collapsed(hintText: "Type a message here..."),
-          // Image button
-          // trailing: <Widget>[
-          //   Container(
-          //       width: 40,
-          //       child: TextButton(child: Icon(Icons.photo), onPressed: () {})),
-          //   // IconButton(icon: Icon(Icons.photo), onPressed: () {}),
-          // ],
-          //
-          // Not really sure how to return a custom widget to this arg.
-          // sendButtonBuilder:
-          //     TextButton(child: Icon(Icons.photo), onPressed: () {}),
+          messageDecorationBuilder: (ChatMessage msg, bool isUser) {
+            return BoxDecoration(
+              borderRadius: BorderRadius.all(Radius.circular(20.0)),
+              color: isUser
+                  ? Theme.of(context).primaryColor
+                  : Colors.grey[200], // example
+            );
+          },
         ),
       ),
       // Spacer for devices with no home button
