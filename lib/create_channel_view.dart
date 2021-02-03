@@ -91,13 +91,13 @@ class _CreateChannelViewState extends State<CreateChannelView> {
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
-      title: Text('Create Channel View', style: TextStyle(color: Colors.black)),
+      title: Text('Select members', style: TextStyle(color: Colors.black)),
       actions: [
-        IconButton(
-          icon: Icon(Icons.more_vert),
-          color: Theme.of(context).buttonColor,
-          onPressed: () {},
-        )
+        // IconButton(
+        //   icon: Icon(Icons.more_vert),
+        //   color: Theme.of(context).buttonColor,
+        //   onPressed: () {},
+        // )
       ],
       centerTitle: true,
     );

@@ -64,7 +64,9 @@ class _ChannelListViewState extends State<ChannelListView> {
       actions: [
         RawMaterialButton(
             padding: EdgeInsets.all(18.0),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/create_channel');
+            },
             shape: CircleBorder(),
             child: Image.asset("assets/iconCreate@3x.png")),
       ],
@@ -97,9 +99,6 @@ class _ChannelListViewState extends State<ChannelListView> {
                 if (member.userId != currentUser.userId &&
                     member.profileUrl != null)
                   Image(image: NetworkImage(member.profileUrl))
-              // CircleAvatar(
-              //     backgroundImage: NetworkImage(member.profileUrl),
-              //     backgroundColor: Colors.grey)
             ]),
       ),
     );
