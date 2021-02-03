@@ -85,7 +85,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
 
   Widget navigationBar() {
     return AppBar(
-      leading: BackButton(color: Color(0xff742DDD)),
+      leading: BackButton(color: Theme.of(context).buttonColor),
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
@@ -95,7 +95,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
       actions: [
         IconButton(
           icon: Icon(Icons.more_vert),
-          color: Color(0xff742DDD),
+          color: Theme.of(context).buttonColor,
           onPressed: () {},
         )
       ],
@@ -115,27 +115,46 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                 User user = selection.user;
 
                 return CheckboxListTile(
-                    tileColor: Colors.purple,
-                    title: Text("${selection.user.nickname}",
-                        style: TextStyle(color: Colors.white)),
-                    controlAffinity: ListTileControlAffinity.platform,
-                    value: selection.isSelected,
-                    onChanged: (bool value) {
-                      //Display chat view
-                      setState(() {
-                        selection.isSelected = !selection.isSelected;
-                      });
+                  tileColor: Colors.white,
+                  title: Text(
+                      selection.user.nickname.isEmpty
+                          ? selection.user.userId
+                          : selection.user.nickname,
+                      style: TextStyle(color: Colors.black)),
+                  controlAffinity: ListTileControlAffinity.platform,
+                  value: SendbirdSdk().getCurrentUser().userId ==
+                          selection.user.userId ||
+                      selection.isSelected,
+                  activeColor: Theme.of(context).primaryColor,
+                  onChanged: (bool value) {
+                    //Display chat view
+                    setState(() {
+                      selection.isSelected = !selection.isSelected;
                     });
+                  },
+                  // TODO: get placeholder outside of avatar
+                  secondary: selection.user.profileUrl.isEmpty
+                      ? CircleAvatar(
+                          child: Text(
+                          selection.user.nickname.isEmpty
+                              ? selection.user.userId.substring(0, 1)
+                              : selection.user.nickname.substring(0, 1),
+                        ))
+                      : CircleAvatar(
+                          backgroundImage:
+                              NetworkImage(selection.user.profileUrl),
+                        ),
+                );
               }),
         ),
         Center(
           child: FlatButton(
-            color: Colors.blue,
+            color: Theme.of(context).buttonColor,
             textColor: Colors.white,
             disabledColor: Colors.grey,
             disabledTextColor: Colors.black,
             padding: EdgeInsets.all(8.0),
-            splashColor: Colors.blueAccent,
+            splashColor: Theme.of(context).primaryColor,
             onPressed: () {
               createChannel().then((channel) {
                 Navigator.push(

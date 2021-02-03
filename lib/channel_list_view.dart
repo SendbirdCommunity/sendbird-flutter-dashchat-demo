@@ -54,7 +54,7 @@ class _ChannelListViewState extends State<ChannelListView> {
 
   Widget navigationBar() {
     return AppBar(
-      leading: BackButton(color: Color(0xff742DDD)),
+      leading: BackButton(color: Theme.of(context).primaryColor),
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
