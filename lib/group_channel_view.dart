@@ -74,6 +74,35 @@ class _GroupChannelViewState extends State<GroupChannelView>
     return namesList.join(", ");
   }
 
+  // TODO: This returns a blank widget for some reason
+  Widget avatarsFrom(GroupChannel channel, User currentUser) {
+    // Generate a channel image from avatars of users, excluding current user
+    return Container(
+      width: 40,
+      height: 40,
+      child: RawMaterialButton(
+        // fillColor: Colors.red,
+        shape: CircleBorder(),
+        clipBehavior: Clip.hardEdge,
+        onPressed: () {},
+        child: GridView.count(
+            crossAxisCount: (channel.memberCount / 2).round(),
+            children: [
+              for (final member in channel.members)
+                if (member.userId != currentUser.userId &&
+                    member.profileUrl != null)
+                  Image(
+                    image: NetworkImage(member.profileUrl),
+                    // errorBuilder: (context, e, st) {
+                    //   print('group_channel_view: ERROR: $e, STACKTRACE: $st');
+                    //   return Image.asset("assets/ios-marketing.png");
+                    // },
+                  )
+            ]),
+      ),
+    );
+  }
+
   Widget navigationBar(GroupChannel channel) {
     return AppBar(
       leading: BackButton(color: Theme.of(context).buttonColor),
@@ -82,14 +111,19 @@ class _GroupChannelViewState extends State<GroupChannelView>
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
-      title: Text(titleFrom(channel, SendbirdSdk().getCurrentUser()),
-          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+      title: ListTile(
+        // leading: avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
+        tileColor: Colors.white,
+        title: Text(titleFrom(channel, SendbirdSdk().getCurrentUser()),
+            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+      ),
       actions: [
-        IconButton(
-          icon: Icon(Icons.more_vert),
-          color: Theme.of(context).buttonColor,
-          onPressed: () {},
-        )
+        // TODO: Add a channel info page
+        // IconButton(
+        //   icon: Icon(Icons.info_outline_rounded),
+        //   color: Theme.of(context).buttonColor,
+        //   onPressed: () {},
+        // )
       ],
       centerTitle: true,
     );

@@ -73,6 +73,25 @@ flutter:
   # "family" key with the font family name, and a "fonts" key with a
   # list giving the asset and other descriptors for the font. For
   # example:
+  fonts: 
+    - family: Gellix
+      fonts: 
+        - asset: assets/gellix/Gellix-Regular.otf
+        - asset: assets/gellix/Gellix-Black.otf
+          weight: 900
+        - asset: assets/gellix/Gellix-ExtraBold.otf
+          weight: 800
+        - asset: assets/gellix/Gellix-Bold.otf
+          weight: 700
+        - asset: assets/gellix/Gellix-SemiBold.otf
+          weight: 600
+        - asset: assets/gellix/Gellix-Medium.otf
+          weight: 500
+        - asset: assets/gellix/Gellix-Light.otf
+          weight: 300
+        - asset: assets/gellix/Gellix-Thin.otf
+          weight: 100
+
   # fonts:
   #   - family: Schyler
   #     fonts:

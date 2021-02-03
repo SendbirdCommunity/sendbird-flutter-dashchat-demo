@@ -147,17 +147,21 @@ class _ChannelListViewState extends State<ChannelListView> {
                                   textAlign: TextAlign.center,
                                   enabled: false,
                                   enableInteractiveSelection: false,
-                                  decoration: new InputDecoration(
-                                      border: new OutlineInputBorder(
-                                        borderRadius: const BorderRadius.all(
-                                          const Radius.circular(20.0),
-                                        ),
-                                      ),
-                                      filled: true,
-                                      hintStyle: new TextStyle(
-                                          color: Colors.white, fontSize: 8),
-                                      hintText: "${channel.unreadMessageCount}",
-                                      fillColor: Color(0xff742DDD)),
+                                  decoration: channel.unreadMessageCount == 0
+                                      ? null
+                                      : new InputDecoration(
+                                          border: new OutlineInputBorder(
+                                            borderRadius:
+                                                const BorderRadius.all(
+                                              const Radius.circular(20.0),
+                                            ),
+                                          ),
+                                          filled: true,
+                                          hintStyle: new TextStyle(
+                                              color: Colors.white, fontSize: 8),
+                                          hintText:
+                                              "${channel.unreadMessageCount}",
+                                          fillColor: Color(0xff742DDD)),
                                 ),
                               ),
                             ],

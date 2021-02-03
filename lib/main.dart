@@ -27,6 +27,7 @@ class MyApp extends StatelessWidget {
           '/create_channel': (context) => CreateChannelView(),
         },
         theme: ThemeData(
+            fontFamily: "Gellix",
             primaryColor: Color(0xff742DDD),
             buttonColor: Color(0xff742DDD),
             textTheme: TextTheme(
