@@ -44,10 +44,14 @@ class LoginView extends StatelessWidget {
                 )),
             Text('Sendbird Sample',
                 style: Theme.of(context).textTheme.headline6),
+            SizedBox(height: 10),
             TextField(
               controller: appIdController,
               decoration: InputDecoration(
+                  border: InputBorder.none,
                   labelText: 'App Id',
+                  filled: true,
+                  fillColor: Colors.grey[200],
                   suffixIcon: IconButton(
                     onPressed: () {
                       appIdController.clear();
@@ -55,10 +59,14 @@ class LoginView extends StatelessWidget {
                     icon: Icon(Icons.clear),
                   )),
             ),
+            SizedBox(height: 10),
             TextField(
               controller: userIdController,
               decoration: InputDecoration(
+                  border: InputBorder.none,
                   labelText: 'User Id',
+                  filled: true,
+                  fillColor: Colors.grey[200],
                   suffixIcon: IconButton(
                     onPressed: () {
                       userIdController.clear();
@@ -66,6 +74,7 @@ class LoginView extends StatelessWidget {
                     icon: Icon(Icons.clear),
                   )),
             ),
+            SizedBox(height: 10),
             FractionallySizedBox(
               widthFactor: 1,
               child: FlatButton(
