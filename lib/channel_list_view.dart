@@ -45,21 +45,23 @@ class _ChannelListViewState extends State<ChannelListView> {
   Widget build(BuildContext context) {
     print('channel_list_view: groupChannels: $groupChannels');
     return Scaffold(
-        backgroundColor: Colors.grey[200],
-        appBar: navigationBar(),
-        body: body(context),
-        floatingActionButton: FloatingActionButton(
-          onPressed: () {
-            Navigator.pushNamed(context, '/create_channel');
-          },
-          child: Icon(Icons.add_circle),
-          backgroundColor: Colors.green,
-        ));
+      backgroundColor: Colors.grey[200],
+      appBar: navigationBar(),
+      body: body(context),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.pushNamed(context, '/create_channel');
+        },
+        child: Icon(Icons.add_circle),
+        backgroundColor: Theme.of(context).buttonColor,
+      ),
+      floatingActionButtonLocation: FloatingActionButtonLocation.centerFloat,
+    );
   }
 
   Widget navigationBar() {
     return AppBar(
-      leading: BackButton(color: Color(0xff742DDD)),
+      leading: BackButton(color: Theme.of(context).primaryColor),
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
@@ -90,9 +92,9 @@ class _ChannelListViewState extends State<ChannelListView> {
                         for (final member in channel.members) member.nickname
                       ].toString();
                       return ListTile(
-                          tileColor: Colors.purple,
-                          title:
-                              Text(name, style: TextStyle(color: Colors.white)),
+                          tileColor: Colors.white,
+                          title: Text(channel?.name ?? channel.channelUrl),
+                          trailing: Text(channel.memberCount.toString()),
                           onTap: () {
                             gotoChannel(channel.channelUrl);
                           });

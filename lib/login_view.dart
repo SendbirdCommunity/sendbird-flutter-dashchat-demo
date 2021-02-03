@@ -8,14 +8,11 @@ class LoginView extends StatelessWidget {
   final appIdController =
       TextEditingController(text: "7A493E5B-B92F-4D01-AD41-7F568AA2AECA");
   final userIdController = TextEditingController();
-  final nicknameController = TextEditingController();
-  final profileUrlController = TextEditingController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
-      appBar: navigationBar(),
+      backgroundColor: Colors.white,
       body: body(context),
     );
   }
@@ -27,117 +24,109 @@ class LoginView extends StatelessWidget {
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
-      title: Text('Login', style: TextStyle(color: Colors.black)),
-      actions: [
-        IconButton(
-          icon: Icon(Icons.more_vert),
-          color: Colors.black,
-          onPressed: () {},
-        )
-      ],
+      title: Text('Sendbird Sample', style: TextStyle(color: Colors.black)),
+      actions: [],
       centerTitle: true,
     );
   }
 
   Widget body(BuildContext context) {
-    return Column(
-      children: [
-        TextField(
-          controller: appIdController,
-          decoration: InputDecoration(
-            icon: Icon(Icons.account_circle),
-            labelText: 'App Id',
-          ),
-        ),
-        TextField(
-          controller: userIdController,
-          decoration: InputDecoration(
-            icon: Icon(Icons.account_circle),
-            labelText: 'User Id',
-          ),
-        ),
-        TextField(
-          controller: nicknameController,
-          decoration: InputDecoration(
-            icon: Icon(Icons.account_circle),
-            labelText: 'Nickname',
-          ),
-        ),
-        TextField(
-          controller: profileUrlController,
-          decoration: InputDecoration(
-            icon: Icon(Icons.account_circle),
-            labelText: 'Profile Image Url',
-          ),
-        ),
-        Center(
-          child: FlatButton(
-            color: Colors.blue,
-            textColor: Colors.white,
-            disabledColor: Colors.grey,
-            disabledTextColor: Colors.black,
-            padding: EdgeInsets.all(8.0),
-            splashColor: Colors.blueAccent,
-            onPressed: () {
-              // Login with Sendbird
-              connect(appIdController.text, userIdController.text,
-                      nicknameController.text, profileUrlController.text)
-                  .then((user) {
-                Navigator.pushNamed(context, '/channel_list');
-              }).catchError((error) {
-                return showDialog<void>(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: new Text("Login Error: $error"),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(15)),
-                        actions: <Widget>[
-                          new FlatButton(
-                            child: new Text("Ok"),
-                            textColor: Colors.greenAccent,
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      );
-                    });
-              });
-            },
-            child: Text(
-              "Connect",
-              style: TextStyle(fontSize: 20.0),
+    return Container(
+        padding: EdgeInsets.only(left: 20, right: 20, top: 100),
+        child: Column(
+          children: [
+            Container(
+                width: 70,
+                height: 70,
+                child: Image(
+                  image: AssetImage('assets/logoSendbird@3x.png'),
+                  fit: BoxFit.scaleDown,
+                )),
+            Text('Sendbird Sample',
+                style: Theme.of(context).textTheme.headline6),
+            SizedBox(height: 10),
+            TextField(
+              controller: appIdController,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: 'App Id',
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      appIdController.clear();
+                    },
+                    icon: Icon(Icons.clear),
+                  )),
             ),
-          ),
-        )
-      ],
-    );
+            SizedBox(height: 10),
+            TextField(
+              controller: userIdController,
+              decoration: InputDecoration(
+                  border: InputBorder.none,
+                  labelText: 'User Id',
+                  filled: true,
+                  fillColor: Colors.grey[200],
+                  suffixIcon: IconButton(
+                    onPressed: () {
+                      userIdController.clear();
+                    },
+                    icon: Icon(Icons.clear),
+                  )),
+            ),
+            SizedBox(height: 10),
+            FractionallySizedBox(
+              widthFactor: 1,
+              child: FlatButton(
+                color: Theme.of(context).buttonColor,
+                textColor: Colors.white,
+                disabledColor: Colors.grey,
+                disabledTextColor: Colors.black,
+                onPressed: () {
+                  // Login with Sendbird
+                  connect(appIdController.text, userIdController.text)
+                      .then((user) {
+                    Navigator.pushNamed(context, '/channel_list');
+                  }).catchError((error) {
+                    return showDialog<void>(
+                        context: context,
+                        barrierDismissible: true,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: new Text("Login Error: $error"),
+                            shape: RoundedRectangleBorder(
+                                borderRadius: new BorderRadius.circular(15)),
+                            actions: <Widget>[
+                              new FlatButton(
+                                child: new Text("Ok"),
+                                textColor: Colors.greenAccent,
+                                onPressed: () {
+                                  Navigator.pop(context);
+                                },
+                              ),
+                            ],
+                          );
+                        });
+                  });
+                },
+                child: Text(
+                  "Sign In",
+                  style: TextStyle(fontSize: 20.0),
+                ),
+              ),
+            )
+          ],
+        ));
   }
 
-  Future<sb.User> connect(
-      String appId, String userId, String nickname, String profileUrl) async {
+  Future<sb.User> connect(String appId, String userId) async {
     try {
       final sendbird = sb.SendbirdSdk(appId: appId);
       final user = await sendbird.connect(userId);
-
-      final shouldUpdateNickname = nickname != '' && user.nickname != nickname;
-      final shouldUpdateProfileUrl =
-          profileUrl != '' && user.profileUrl != profileUrl;
-
-      if (shouldUpdateNickname || shouldUpdateProfileUrl) {
-        final imageInfo = sb.ImageInfo.fromUrl(
-            url: shouldUpdateProfileUrl ? profileUrl : user.profileUrl);
-        await sendbird.updateCurrentUserInfo(
-            nickname: shouldUpdateNickname ? nickname : user.nickname,
-            imageInfo: imageInfo,
-            preferredLanguages: []);
-      }
       return user;
-    } catch (error) {
-      print('login_view: connect: ERROR: $error');
-      throw error;
+    } catch (e) {
+      print('login_view: connect: ERROR: $e');
+      throw e;
     }
   }
 }
