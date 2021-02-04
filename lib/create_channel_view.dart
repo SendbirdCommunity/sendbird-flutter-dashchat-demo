@@ -93,11 +93,47 @@ class _CreateChannelViewState extends State<CreateChannelView> {
           UniversalPlatform.isAndroid == true ? false : true,
       title: Text('Select members', style: TextStyle(color: Colors.black)),
       actions: [
-        // IconButton(
-        //   icon: Icon(Icons.more_vert),
-        //   color: Theme.of(context).buttonColor,
-        //   onPressed: () {},
-        // )
+        FlatButton(
+          textColor: Theme.of(context).primaryColor,
+          disabledColor: Colors.grey,
+          disabledTextColor: Colors.black,
+          padding: EdgeInsets.all(8.0),
+          splashColor: Theme.of(context).primaryColor,
+          onPressed: () {
+            createChannel().then((channel) {
+              Navigator.push(
+                context,
+                MaterialPageRoute(
+                  builder: (context) => GroupChannelView(groupChannel: channel),
+                ),
+              );
+            }).catchError((error) {
+              return showDialog<void>(
+                  context: context,
+                  barrierDismissible: true,
+                  builder: (BuildContext context) {
+                    return AlertDialog(
+                      title: new Text("Channel Creation Error: $error"),
+                      shape: RoundedRectangleBorder(
+                          borderRadius: new BorderRadius.circular(15)),
+                      actions: <Widget>[
+                        new FlatButton(
+                          child: new Text("Ok"),
+                          textColor: Colors.greenAccent,
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                        ),
+                      ],
+                    );
+                  });
+            });
+          },
+          child: Text(
+            "Create",
+            style: TextStyle(fontSize: 20.0),
+          ),
+        )
       ],
       centerTitle: true,
     );
@@ -106,7 +142,6 @@ class _CreateChannelViewState extends State<CreateChannelView> {
   Widget body(BuildContext context) {
     return Column(
       children: [
-        // TODO: ListView here
         Expanded(
           child: ListView.builder(
               itemCount: selections.length,
@@ -132,7 +167,6 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                       selection.isSelected = !selection.isSelected;
                     });
                   },
-                  // TODO: get placeholder outside of avatar
                   secondary: selection.user.profileUrl.isEmpty
                       ? CircleAvatar(
                           child: Text(
@@ -149,51 +183,6 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                 );
               }),
         ),
-        Center(
-          child: FlatButton(
-            color: Theme.of(context).buttonColor,
-            textColor: Colors.white,
-            disabledColor: Colors.grey,
-            disabledTextColor: Colors.black,
-            padding: EdgeInsets.all(8.0),
-            splashColor: Theme.of(context).primaryColor,
-            onPressed: () {
-              createChannel().then((channel) {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) =>
-                        GroupChannelView(groupChannel: channel),
-                  ),
-                );
-              }).catchError((error) {
-                return showDialog<void>(
-                    context: context,
-                    barrierDismissible: true,
-                    builder: (BuildContext context) {
-                      return AlertDialog(
-                        title: new Text("Channel Creation Error: $error"),
-                        shape: RoundedRectangleBorder(
-                            borderRadius: new BorderRadius.circular(15)),
-                        actions: <Widget>[
-                          new FlatButton(
-                            child: new Text("Ok"),
-                            textColor: Colors.greenAccent,
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                          ),
-                        ],
-                      );
-                    });
-              });
-            },
-            child: Text(
-              "Create",
-              style: TextStyle(fontSize: 20.0),
-            ),
-          ),
-        )
       ],
     );
   }
