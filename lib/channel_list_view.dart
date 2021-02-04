@@ -97,7 +97,7 @@ class _ChannelListViewState extends State<ChannelListView> {
             children: [
               for (final member in channel.members)
                 if (member.userId != currentUser.userId &&
-                    member.profileUrl != null)
+                    member.profileUrl.isNotEmpty)
                   Image(image: NetworkImage(member.profileUrl))
             ]),
       ),
@@ -107,8 +107,7 @@ class _ChannelListViewState extends State<ChannelListView> {
   Widget body(BuildContext context) {
     return Column(
       children: [
-        // TODO: ListView here
-        groupChannels.length != 0
+        groupChannels.isNotEmpty
             ? Expanded(
                 child: ListView.builder(
                     itemCount: groupChannels.length,
@@ -160,7 +159,8 @@ class _ChannelListViewState extends State<ChannelListView> {
                                               color: Colors.white, fontSize: 8),
                                           hintText:
                                               "${channel.unreadMessageCount}",
-                                          fillColor: Color(0xff742DDD)),
+                                          fillColor:
+                                              Theme.of(context).primaryColor),
                                 ),
                               ),
                             ],
