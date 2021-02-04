@@ -136,9 +136,11 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                   secondary: selection.user.profileUrl.isEmpty
                       ? CircleAvatar(
                           child: Text(
-                          selection.user.nickname.isEmpty
-                              ? selection.user.userId.substring(0, 1)
-                              : selection.user.nickname.substring(0, 1),
+                          (selection.user.nickname.isEmpty
+                                  ? selection.user.userId
+                                  : selection.user.nickname)
+                              .substring(0, 1)
+                              .toUpperCase(),
                         ))
                       : CircleAvatar(
                           backgroundImage:
