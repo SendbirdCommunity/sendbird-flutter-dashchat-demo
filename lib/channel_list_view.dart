@@ -9,7 +9,8 @@ class ChannelListView extends StatefulWidget {
   _ChannelListViewState createState() => _ChannelListViewState();
 }
 
-class _ChannelListViewState extends State<ChannelListView> {
+class _ChannelListViewState extends State<ChannelListView>
+    with ChannelEventHandler {
   List<GroupChannel> groupChannels = [];
 
   Future<void> updateGroupChannels() async {
@@ -39,8 +40,21 @@ class _ChannelListViewState extends State<ChannelListView> {
   @override
   void initState() {
     super.initState();
+    SendbirdSdk().addChannelHandler(
+        'list-channel-handler-$SendbirdSdk().getCurrentUser().userId', this);
     updateGroupChannels();
   }
+
+  @override
+  void onUserJoined(GroupChannel channel, User user) {
+    if (user.userId == SendbirdSdk().getCurrentUser().userId) {
+      setState(() {
+        this.groupChannels = [channel, ...groupChannels];
+      });
+    }
+  }
+
+  // TODO: channel change handler + other event handlers
 
   @override
   Widget build(BuildContext context) {
