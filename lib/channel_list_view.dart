@@ -116,7 +116,7 @@ class _ChannelListViewState extends State<ChannelListView> {
                       GroupChannel channel = groupChannels[index];
                       DateTime lastMessageDate =
                           DateTime.fromMillisecondsSinceEpoch(
-                              channel.lastMessage.createdAt);
+                              channel?.lastMessage?.createdAt ?? 0);
                       String lastMessageDateString =
                           DateFormat("E").format(lastMessageDate);
                       return Padding(
@@ -131,7 +131,7 @@ class _ChannelListViewState extends State<ChannelListView> {
                               style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold)),
-                          subtitle: Text(channel.lastMessage.message),
+                          subtitle: Text(channel?.lastMessage?.message ?? ''),
                           onTap: () {
                             gotoChannel(channel.channelUrl);
                           },
