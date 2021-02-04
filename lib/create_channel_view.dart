@@ -77,7 +77,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
+      backgroundColor: Colors.white,
       appBar: navigationBar(),
       body: body(context),
     );
@@ -147,7 +147,6 @@ class _CreateChannelViewState extends State<CreateChannelView> {
               itemCount: selections.length,
               itemBuilder: (context, index) {
                 UserSelection selection = selections[index];
-                User user = selection.user;
 
                 return CheckboxListTile(
                   tileColor: Colors.white,
