@@ -34,7 +34,7 @@ class MyApp extends StatelessWidget {
                 headline1:
                     TextStyle(fontSize: 72.0, fontWeight: FontWeight.bold),
                 headline6:
-                    TextStyle(fontSize: 36.0, fontWeight: FontWeight.bold)),
+                    TextStyle(fontSize: 32.0, fontWeight: FontWeight.bold)),
             textSelectionTheme: TextSelectionThemeData(
               cursorColor: Color(0xff732cdd),
               selectionHandleColor: Color(0xff732cdd),
