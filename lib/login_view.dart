@@ -4,10 +4,26 @@ import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart' as sb;
 
-class LoginView extends StatelessWidget {
+class LoginView extends StatefulWidget {
+  @override
+  LoginViewState createState() => LoginViewState();
+}
+
+class LoginViewState extends State<LoginView> {
   final appIdController =
       TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
   final userIdController = TextEditingController();
+  bool enableSignInButton = false;
+
+  bool shouldEnableSignInButton() {
+    if (appIdController.text == null || appIdController.text == "") {
+      return false;
+    }
+    if (userIdController.text == null || userIdController.text == "") {
+      return false;
+    }
+    return true;
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,6 +64,11 @@ class LoginView extends StatelessWidget {
             SizedBox(height: 40),
             TextField(
               controller: appIdController,
+              onChanged: (value) {
+                setState(() {
+                  enableSignInButton = shouldEnableSignInButton();
+                });
+              },
               decoration: InputDecoration(
                   border: InputBorder.none,
                   labelText: 'App Id',
@@ -63,6 +84,12 @@ class LoginView extends StatelessWidget {
             SizedBox(height: 10),
             TextField(
               controller: userIdController,
+              onChanged: (value) {
+                setState(() {
+                  print('app id field changed state to: $value');
+                  enableSignInButton = shouldEnableSignInButton();
+                });
+              },
               decoration: InputDecoration(
                   border: InputBorder.none,
                   labelText: 'User Id',
@@ -78,47 +105,102 @@ class LoginView extends StatelessWidget {
             SizedBox(height: 30),
             FractionallySizedBox(
               widthFactor: 1,
-              child: FlatButton(
-                height: 50,
-                color: Theme.of(context).buttonColor,
-                textColor: Colors.white,
-                disabledColor: Colors.grey,
-                disabledTextColor: Colors.black,
-                onPressed: () {
-                  // Login with Sendbird
-                  connect(appIdController.text, userIdController.text)
-                      .then((user) {
-                    Navigator.pushNamed(context, '/channel_list');
-                  }).catchError((error) {
-                    return showDialog<void>(
-                        context: context,
-                        barrierDismissible: true,
-                        builder: (BuildContext context) {
-                          return AlertDialog(
-                            title: new Text("Login Error: $error"),
-                            shape: RoundedRectangleBorder(
-                                borderRadius: new BorderRadius.circular(15)),
-                            actions: <Widget>[
-                              new FlatButton(
-                                child: new Text("Ok"),
-                                textColor: Colors.greenAccent,
-                                onPressed: () {
-                                  Navigator.pop(context);
-                                },
-                              ),
-                            ],
-                          );
-                        });
-                  });
-                },
-                child: Text(
-                  "Sign In",
-                  style: TextStyle(fontSize: 20.0),
-                ),
-              ),
+              child: _signInButton(context, enableSignInButton),
+              // child: FlatButton(
+              //   height: 50,
+              //   color: Theme.of(context).buttonColor,
+              //   textColor: Colors.white,
+              //   disabledColor: Colors.grey,
+              //   disabledTextColor: Colors.black,
+              //   onPressed: () {
+              //     // Login with Sendbird
+              //     connect(appIdController.text, userIdController.text)
+              //         .then((user) {
+              //       Navigator.pushNamed(context, '/channel_list');
+              //     }).catchError((error) {
+              //       return showDialog<void>(
+              //           context: context,
+              //           barrierDismissible: true,
+              //           builder: (BuildContext context) {
+              //             return AlertDialog(
+              //               title: new Text("Login Error: $error"),
+              //               shape: RoundedRectangleBorder(
+              //                   borderRadius: new BorderRadius.circular(15)),
+              //               actions: <Widget>[
+              //                 new FlatButton(
+              //                   child: new Text("Ok"),
+              //                   textColor: Colors.greenAccent,
+              //                   onPressed: () {
+              //                     Navigator.pop(context);
+              //                   },
+              //                 ),
+              //               ],
+              //             );
+              //           });
+              //     });
+              //   },
+              //   child: Text(
+              //     "Sign In",
+              //     style: TextStyle(fontSize: 20.0),
+              //   ),
+              // ),
             )
           ],
         ));
+  }
+
+  Widget _signInButton(BuildContext context, bool enabled) {
+    if (enabled == false) {
+      return FlatButton(
+        height: 50,
+        color: Colors.grey,
+        textColor: Colors.white,
+        disabledColor: Colors.grey,
+        disabledTextColor: Colors.black,
+        onPressed: () {},
+        child: Text(
+          "Sign In",
+          style: TextStyle(fontSize: 20.0),
+        ),
+      );
+    }
+    return FlatButton(
+      height: 50,
+      color: Theme.of(context).buttonColor,
+      textColor: Colors.white,
+      disabledColor: Colors.grey,
+      disabledTextColor: Colors.black,
+      onPressed: () {
+        // Login with Sendbird
+        connect(appIdController.text, userIdController.text).then((user) {
+          Navigator.pushNamed(context, '/channel_list');
+        }).catchError((error) {
+          return showDialog<void>(
+              context: context,
+              barrierDismissible: true,
+              builder: (BuildContext context) {
+                return AlertDialog(
+                  title: new Text("Login Error: $error"),
+                  shape: RoundedRectangleBorder(
+                      borderRadius: new BorderRadius.circular(15)),
+                  actions: <Widget>[
+                    new FlatButton(
+                      child: new Text("Ok"),
+                      textColor: Colors.greenAccent,
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                  ],
+                );
+              });
+        });
+      },
+      child: Text(
+        "Sign In",
+        style: TextStyle(fontSize: 20.0),
+      ),
+    );
   }
 
   Future<sb.User> connect(String appId, String userId) async {
