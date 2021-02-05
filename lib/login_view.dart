@@ -106,44 +106,6 @@ class LoginViewState extends State<LoginView> {
             FractionallySizedBox(
               widthFactor: 1,
               child: _signInButton(context, enableSignInButton),
-              // child: FlatButton(
-              //   height: 50,
-              //   color: Theme.of(context).buttonColor,
-              //   textColor: Colors.white,
-              //   disabledColor: Colors.grey,
-              //   disabledTextColor: Colors.black,
-              //   onPressed: () {
-              //     // Login with Sendbird
-              //     connect(appIdController.text, userIdController.text)
-              //         .then((user) {
-              //       Navigator.pushNamed(context, '/channel_list');
-              //     }).catchError((error) {
-              //       return showDialog<void>(
-              //           context: context,
-              //           barrierDismissible: true,
-              //           builder: (BuildContext context) {
-              //             return AlertDialog(
-              //               title: new Text("Login Error: $error"),
-              //               shape: RoundedRectangleBorder(
-              //                   borderRadius: new BorderRadius.circular(15)),
-              //               actions: <Widget>[
-              //                 new FlatButton(
-              //                   child: new Text("Ok"),
-              //                   textColor: Colors.greenAccent,
-              //                   onPressed: () {
-              //                     Navigator.pop(context);
-              //                   },
-              //                 ),
-              //               ],
-              //             );
-              //           });
-              //     });
-              //   },
-              //   child: Text(
-              //     "Sign In",
-              //     style: TextStyle(fontSize: 20.0),
-              //   ),
-              // ),
             )
           ],
         ));
@@ -175,18 +137,38 @@ class LoginViewState extends State<LoginView> {
         connect(appIdController.text, userIdController.text).then((user) {
           Navigator.pushNamed(context, '/channel_list');
         }).catchError((error) {
+          print('login_view.dart: _signInButton: ERROR: $error');
           return showDialog<void>(
               context: context,
               barrierDismissible: true,
               builder: (BuildContext context) {
                 return AlertDialog(
-                  title: new Text("Login Error: $error"),
+                  title: RichText(
+                    textAlign: TextAlign.left,
+                    softWrap: true,
+                    text: TextSpan(
+                      text: 'Login Failed:  ',
+                      style: TextStyle(
+                          fontSize: 18,
+                          color: Colors.red,
+                          fontWeight: FontWeight.bold),
+                      children: <TextSpan>[
+                        TextSpan(
+                            text: 'Check connectivity and App Id',
+                            style:
+                                TextStyle(color: Colors.black, fontSize: 16)),
+                      ],
+                    ),
+                  ),
+                  // title: new Text("Login Failed: Check connectivity and App Id",
+                  //     style: TextStyle(fontSize: 18)),
                   shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15)),
                   actions: <Widget>[
                     new FlatButton(
-                      child: new Text("Ok"),
-                      textColor: Colors.greenAccent,
+                      child: new Text("OK",
+                          style: TextStyle(fontWeight: FontWeight.bold)),
+                      textColor: Theme.of(context).buttonColor,
                       onPressed: () {
                         Navigator.pop(context);
                       },
