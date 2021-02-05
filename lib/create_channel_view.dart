@@ -101,7 +101,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
           splashColor: Theme.of(context).primaryColor,
           onPressed: () {
             createChannel().then((channel) {
-              Navigator.push(
+              Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
                   builder: (context) => GroupChannelView(groupChannel: channel),
