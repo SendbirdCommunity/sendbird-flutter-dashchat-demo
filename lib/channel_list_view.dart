@@ -99,6 +99,12 @@ class _ChannelListViewState extends State<ChannelListView>
 
   Widget avatarsFrom(GroupChannel channel, User currentUser) {
     // Generate a channel image from avatars of users, excluding current user
+    int crossAxisCount = 1;
+    if (channel.memberCount > 3) {
+      crossAxisCount = 2;
+    } else {
+      (channel.memberCount / 2).round();
+    }
     return Container(
       width: 40,
       height: 40,
@@ -106,14 +112,12 @@ class _ChannelListViewState extends State<ChannelListView>
         shape: CircleBorder(),
         clipBehavior: Clip.hardEdge,
         onPressed: () {},
-        child: GridView.count(
-            crossAxisCount: (channel.memberCount / 2).round(),
-            children: [
-              for (final member in channel.members)
-                if (member.userId != currentUser.userId &&
-                    member.profileUrl.isNotEmpty)
-                  Image(image: NetworkImage(member.profileUrl))
-            ]),
+        child: GridView.count(crossAxisCount: crossAxisCount, children: [
+          for (final member in channel.members)
+            if (member.userId != currentUser.userId &&
+                member.profileUrl.isNotEmpty)
+              Image(image: NetworkImage(member.profileUrl), fit: BoxFit.cover)
+        ]),
       ),
     );
   }
