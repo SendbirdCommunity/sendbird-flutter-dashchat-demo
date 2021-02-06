@@ -76,13 +76,16 @@ class _ChannelListViewState extends State<ChannelListView>
           UniversalPlatform.isAndroid == true ? false : true,
       title: Text('Channels', style: TextStyle(color: Colors.black)),
       actions: [
-        RawMaterialButton(
-            padding: EdgeInsets.all(18.0),
-            onPressed: () {
-              Navigator.pushNamed(context, '/create_channel');
-            },
-            shape: CircleBorder(),
-            child: Image.asset("assets/iconCreate@3x.png")),
+        Container(
+          width: 60,
+          child: RawMaterialButton(
+              padding: EdgeInsets.fromLTRB(0, 18, 0, 18),
+              onPressed: () {
+                Navigator.pushNamed(context, '/create_channel');
+              },
+              shape: CircleBorder(),
+              child: Image.asset("assets/iconCreate@3x.png")),
+        ),
       ],
       centerTitle: true,
     );
