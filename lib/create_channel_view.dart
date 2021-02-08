@@ -149,7 +149,7 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                 UserSelection selection = selections[index];
 
                 return CheckboxListTile(
-                  tileColor: Colors.white,
+                  // tileColor: Colors.white,
                   title: Text(
                       selection.user.nickname.isEmpty
                           ? selection.user.userId

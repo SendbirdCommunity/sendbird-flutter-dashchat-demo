@@ -41,7 +41,7 @@ class _GroupChannelViewState extends State<GroupChannelView>
     updateMessages();
   }
 
-  Future<void> updateMessages() {
+  Future<void> updateMessages() async {
     getMessages(widget.groupChannel);
   }
 
@@ -77,28 +77,25 @@ class _GroupChannelViewState extends State<GroupChannelView>
   // TODO: This returns a blank widget for some reason
   Widget avatarsFrom(GroupChannel channel, User currentUser) {
     // Generate a channel image from avatars of users, excluding current user
+    int crossAxisCount = 1;
+    if (channel.memberCount > 3) {
+      crossAxisCount = 2;
+    } else {
+      (channel.memberCount / 2).round();
+    }
     return Container(
       width: 40,
       height: 40,
       child: RawMaterialButton(
-        // fillColor: Colors.red,
         shape: CircleBorder(),
         clipBehavior: Clip.hardEdge,
         onPressed: () {},
-        child: GridView.count(
-            crossAxisCount: (channel.memberCount / 2).round(),
-            children: [
-              for (final member in channel.members)
-                if (member.userId != currentUser.userId &&
-                    member.profileUrl != null)
-                  Image(
-                    image: NetworkImage(member.profileUrl),
-                    // errorBuilder: (context, e, st) {
-                    //   print('group_channel_view: ERROR: $e, STACKTRACE: $st');
-                    //   return Image.asset("assets/ios-marketing.png");
-                    // },
-                  )
-            ]),
+        child: GridView.count(crossAxisCount: crossAxisCount, children: [
+          for (final member in channel.members)
+            if (member.userId != currentUser.userId &&
+                member.profileUrl.isNotEmpty)
+              Image(image: NetworkImage(member.profileUrl), fit: BoxFit.cover)
+        ]),
       ),
     );
   }
@@ -111,8 +108,9 @@ class _GroupChannelViewState extends State<GroupChannelView>
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
+      // title: avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
       title: ListTile(
-        // leading: avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
+        leading: avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
         tileColor: Colors.white,
         title: Text(titleFrom(channel, SendbirdSdk().getCurrentUser()),
             style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
@@ -171,14 +169,18 @@ class _GroupChannelViewState extends State<GroupChannelView>
 
   List<ChatMessage> asDashChatMessages(List<BaseMessage> messages) {
     List<ChatMessage> result = [];
-    messages.forEach((message) {
-      User user = message.sender;
-      result.add(ChatMessage(
-          createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
-          text: message.message,
-          user: ChatUser(
-              name: user.nickname, uid: user.userId, avatar: user.profileUrl)));
-    });
+    if (messages != null) {
+      messages.forEach((message) {
+        User user = message.sender;
+        result.add(ChatMessage(
+            createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
+            text: message.message,
+            user: ChatUser(
+                name: user.nickname,
+                uid: user.userId,
+                avatar: user.profileUrl)));
+      });
+    }
     return result;
   }
 

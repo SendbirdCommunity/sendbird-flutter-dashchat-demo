@@ -86,7 +86,6 @@ class LoginViewState extends State<LoginView> {
               controller: userIdController,
               onChanged: (value) {
                 setState(() {
-                  print('app id field changed state to: $value');
                   enableSignInButton = shouldEnableSignInButton();
                 });
               },

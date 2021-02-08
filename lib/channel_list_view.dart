@@ -58,7 +58,6 @@ class _ChannelListViewState extends State<ChannelListView>
 
   @override
   Widget build(BuildContext context) {
-    print('channel_list_view: groupChannels: $groupChannels');
     return Scaffold(
       backgroundColor: Colors.grey[200],
       appBar: navigationBar(),
