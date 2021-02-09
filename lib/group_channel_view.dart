@@ -23,7 +23,19 @@ class _GroupChannelViewState extends State<GroupChannelView>
   void initState() {
     super.initState();
     getMessages(widget.groupChannel);
+    // SendbirdSdk()
+    //     .messageReceiveStream(widget.groupChannel.channelUrl)
+    //     .listen((message) {
+    //   _messages.add(message);
+    // });
     SendbirdSdk().addChannelHandler(widget.groupChannel.channelUrl, this);
+  }
+
+  @override
+  void dispose() {
+    // TODO: implement dispose
+    super.dispose();
+    SendbirdSdk().removeChannelHandler(widget.groupChannel.channelUrl);
   }
 
   // Sendbird Channel Event Handling
@@ -37,12 +49,11 @@ class _GroupChannelViewState extends State<GroupChannelView>
   // TODO: Add other handler methods
 
   void onSend(ChatMessage message) async {
-    widget.groupChannel.sendUserMessage(message.text);
-    updateMessages();
-  }
-
-  Future<void> updateMessages() async {
-    getMessages(widget.groupChannel);
+    widget.groupChannel.sendUserMessageWithText(message.text).then((msg) {
+      setState(() {
+        _messages.add(msg);
+      });
+    }).catchError((e) {});
   }
 
   Future<void> getMessages(GroupChannel channel) async {
@@ -172,13 +183,17 @@ class _GroupChannelViewState extends State<GroupChannelView>
     if (messages != null) {
       messages.forEach((message) {
         User user = message.sender;
-        result.add(ChatMessage(
+        result.add(
+          ChatMessage(
             createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
             text: message.message,
             user: ChatUser(
-                name: user.nickname,
-                uid: user.userId,
-                avatar: user.profileUrl)));
+              name: user.nickname,
+              uid: user.userId,
+              avatar: user.profileUrl,
+            ),
+          ),
+        );
       });
     }
     return result;

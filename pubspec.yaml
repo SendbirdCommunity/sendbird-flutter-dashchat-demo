@@ -32,6 +32,7 @@ dependencies:
   # sendbirdsdk:
   #   git: https://github.com/sendbird/messaging-flutter.git
   sendbirdsdk:
+    # path: '../messaging-flutter'
     hosted:
       name: sendbirdsdk
       url: https://dl.cloudsmith.io/public/sendbird/sendbird-sdk-flutter/dart/

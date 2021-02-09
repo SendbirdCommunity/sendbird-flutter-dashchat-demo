@@ -12,13 +12,17 @@ class ChannelListView extends StatefulWidget {
 class _ChannelListViewState extends State<ChannelListView>
     with ChannelEventHandler {
   List<GroupChannel> groupChannels = [];
+  bool isLoading = false;
 
   Future<void> updateGroupChannels() async {
+    this.isLoading = true;
+
     List<GroupChannel> newChannels = await getGroupChannels();
     if (newChannels == this.groupChannels) {
       return;
     }
     setState(() {
+      this.isLoading = false;
       this.groupChannels = newChannels;
     });
   }
@@ -127,7 +131,7 @@ class _ChannelListViewState extends State<ChannelListView>
   Widget body(BuildContext context) {
     return Column(
       children: [
-        groupChannels.isNotEmpty
+        !isLoading
             ? Expanded(
                 child: ListView.builder(
                     itemCount: groupChannels.length,
