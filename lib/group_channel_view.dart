@@ -3,9 +3,7 @@ import 'package:universal_platform/universal_platform.dart';
 import 'package:dash_chat/dash_chat.dart';
 import 'package:sendbirdsdk/sendbirdsdk.dart';
 import 'dart:async';
-import 'dart:io';
 import 'package:intl/intl.dart';
-import 'package:dash_chat/dash_chat.dart';
 
 class GroupChannelView extends StatefulWidget {
   GroupChannel groupChannel;
@@ -83,19 +81,25 @@ class _GroupChannelViewState extends State<GroupChannelView>
     } else {
       (channel.memberCount / 2).round();
     }
-    return Container(
-      width: 40,
-      height: 40,
-      child: RawMaterialButton(
-        shape: CircleBorder(),
-        clipBehavior: Clip.hardEdge,
-        onPressed: () {},
-        child: GridView.count(crossAxisCount: crossAxisCount, children: [
-          for (final member in channel.members)
-            if (member.userId != currentUser.userId &&
-                member.profileUrl.isNotEmpty)
-              Image(image: NetworkImage(member.profileUrl), fit: BoxFit.cover)
-        ]),
+    List<String> imageUrls = [
+      for (final member in channel.members) member.profileUrl
+    ];
+    imageUrls.remove(currentUser.profileUrl);
+    return RawMaterialButton(
+      shape: CircleBorder(),
+      clipBehavior: Clip.hardEdge,
+      onPressed: () {},
+      child: Container(
+        width: 60,
+        height: 60,
+        child: GridView.count(
+            reverse: true,
+            crossAxisCount: crossAxisCount,
+            physics: NeverScrollableScrollPhysics(),
+            children: [
+              for (final imageUrl in imageUrls)
+                Image(image: NetworkImage(imageUrl), fit: BoxFit.cover)
+            ]),
       ),
     );
   }
@@ -108,22 +112,32 @@ class _GroupChannelViewState extends State<GroupChannelView>
       backgroundColor: Colors.white,
       automaticallyImplyLeading:
           UniversalPlatform.isAndroid == true ? false : true,
-      // title: avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
-      title: ListTile(
-        leading: avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
-        tileColor: Colors.white,
-        title: Text(titleFrom(channel, SendbirdSdk().getCurrentUser()),
-            style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+      title: Row(
+        children: [
+          avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
+          Container(
+            width: 250,
+            child: Text(
+              titleFrom(channel, SendbirdSdk().getCurrentUser()),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 18),
+              overflow: TextOverflow.ellipsis,
+              maxLines: 1,
+            ),
+          )
+        ],
       ),
-      actions: [
-        // TODO: Add a channel info page
-        // IconButton(
-        //   icon: Icon(Icons.info_outline_rounded),
-        //   color: Theme.of(context).buttonColor,
-        //   onPressed: () {},
-        // )
-      ],
-      centerTitle: true,
+      // actions: [
+      // TODO: Add a channel info page
+      // IconButton(
+      //   icon: Icon(Icons.info_outline_rounded),
+      //   color: Theme.of(context).buttonColor,
+      //   onPressed: () {},
+      // )
+      // ],
+      centerTitle: false,
     );
   }
 
