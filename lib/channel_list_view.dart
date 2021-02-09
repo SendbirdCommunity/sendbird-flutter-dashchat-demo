@@ -118,12 +118,17 @@ class _ChannelListViewState extends State<ChannelListView>
         shape: CircleBorder(),
         clipBehavior: Clip.hardEdge,
         onPressed: () {},
-        child: GridView.count(crossAxisCount: crossAxisCount, children: [
-          for (final member in channel.members)
-            if (member.userId != currentUser.userId &&
-                member.profileUrl.isNotEmpty)
-              Image(image: NetworkImage(member.profileUrl), fit: BoxFit.cover)
-        ]),
+        child: GridView.count(
+          physics: NeverScrollableScrollPhysics(),
+          reverse: true,
+          crossAxisCount: crossAxisCount,
+          children: [
+            for (final member in channel.members)
+              if (member.userId != currentUser.userId &&
+                  member.profileUrl.isNotEmpty)
+                Image(image: NetworkImage(member.profileUrl), fit: BoxFit.cover)
+          ],
+        ),
       ),
     );
   }
