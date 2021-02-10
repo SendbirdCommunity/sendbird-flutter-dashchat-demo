@@ -197,7 +197,10 @@ class _ChannelListViewState extends State<ChannelListView>
                         ),
                       );
                     }))
-            : Center(child: CircularProgressIndicator())
+            : Column(children: [
+                Container(height: 100),
+                Center(child: CircularProgressIndicator())
+              ])
       ],
     );
   }
