@@ -20,4 +20,4 @@ Chrome (web)                                 • chrome                         
 Execute `flutter run -d <device_id>` to run the app on a given device (ie `flutter run -d FB`)
 
 The first screen should then appear:
-![login_screen](https://user-images.githubusercontent.com/83082691/116323060-1d066200-a772-11eb-8ca8-1f8d1101f6ed.png)
+![login_screen](https://user-images.githubusercontent.com/83082691/116323395-bd5c8680-a772-11eb-96dd-cd1ebeb59caa.png)
