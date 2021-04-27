@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:flutter_demo/group_channel_view.dart';
+import 'package:sendbird_flutter_dashchat/group_channel_view.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:sendbirdsdk/sendbirdsdk.dart';
+import 'package:sendbird_sdk/sendbird_sdk.dart';
 
 class CreateChannelView extends StatefulWidget {
   @override
@@ -27,7 +27,6 @@ List<UserSelection> selectedUsersFrom(List<User> users) {
 }
 
 class _CreateChannelViewState extends State<CreateChannelView> {
-  // List<User> users = [];
   List<UserSelection> selections = [];
 
   Future<void> updateUsers() async {
@@ -93,13 +92,15 @@ class _CreateChannelViewState extends State<CreateChannelView> {
           UniversalPlatform.isAndroid == true ? false : true,
       title: Text('Select members', style: TextStyle(color: Colors.black)),
       actions: [
-        FlatButton(
-          textColor: Theme.of(context).primaryColor,
-          disabledColor: Colors.grey,
-          disabledTextColor: Colors.black,
-          padding: EdgeInsets.all(8.0),
-          splashColor: Theme.of(context).primaryColor,
+        TextButton(
+          style: ButtonStyle(
+              foregroundColor: MaterialStateProperty.all<Color>(
+                  Theme.of(context).buttonColor)),
           onPressed: () {
+            if (!isAnyoneElseSelected()) {
+              // Don't create a channel if no other user selected
+              return;
+            }
             createChannel().then((channel) {
               Navigator.pushReplacement(
                 context,
@@ -117,9 +118,13 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                       shape: RoundedRectangleBorder(
                           borderRadius: new BorderRadius.circular(15)),
                       actions: <Widget>[
-                        new FlatButton(
+                        new TextButton(
+                          style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all<Color>(
+                                  Theme.of(context).buttonColor),
+                              foregroundColor: MaterialStateProperty.all<Color>(
+                                  Colors.white)),
                           child: new Text("Ok"),
-                          textColor: Colors.greenAccent,
                           onPressed: () {
                             Navigator.pop(context);
                           },
@@ -139,6 +144,10 @@ class _CreateChannelViewState extends State<CreateChannelView> {
     );
   }
 
+  bool isAnyoneElseSelected() {
+    return this.selections.where((item) => item.isSelected).toList().length > 0;
+  }
+
   Widget body(BuildContext context) {
     return Column(
       children: [
@@ -149,14 +158,13 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                 UserSelection selection = selections[index];
 
                 return CheckboxListTile(
-                  // tileColor: Colors.white,
                   title: Text(
                       selection.user.nickname.isEmpty
                           ? selection.user.userId
                           : selection.user.nickname,
                       style: TextStyle(color: Colors.black)),
                   controlAffinity: ListTileControlAffinity.platform,
-                  value: SendbirdSdk().getCurrentUser().userId ==
+                  value: SendbirdSdk().currentUser.userId ==
                           selection.user.userId ||
                       selection.isSelected,
                   activeColor: Theme.of(context).primaryColor,

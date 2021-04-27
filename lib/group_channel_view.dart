@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
 import 'package:dash_chat/dash_chat.dart';
-import 'package:sendbirdsdk/sendbirdsdk.dart';
+import 'package:sendbird_sdk/sendbird_sdk.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
@@ -21,19 +21,13 @@ class _GroupChannelViewState extends State<GroupChannelView>
   void initState() {
     super.initState();
     getMessages(widget.groupChannel);
-    // SendbirdSdk()
-    //     .messageReceiveStream(widget.groupChannel.channelUrl)
-    //     .listen((message) {
-    //   _messages.add(message);
-    // });
-    SendbirdSdk().addChannelHandler(widget.groupChannel.channelUrl, this);
+    SendbirdSdk().addChannelEventHandler(widget.groupChannel.channelUrl, this);
   }
 
   @override
   void dispose() {
-    // TODO: implement dispose
+    SendbirdSdk().removeChannelEventHandler(widget.groupChannel.channelUrl);
     super.dispose();
-    SendbirdSdk().removeChannelHandler(widget.groupChannel.channelUrl);
   }
 
   // Sendbird Channel Event Handling
@@ -44,14 +38,11 @@ class _GroupChannelViewState extends State<GroupChannelView>
     });
   }
 
-  // TODO: Add other handler methods
-
   void onSend(ChatMessage message) async {
-    widget.groupChannel.sendUserMessageWithText(message.text).then((msg) {
-      setState(() {
-        _messages.add(msg);
-      });
-    }).catchError((e) {});
+    var sentMessage = widget.groupChannel.sendUserMessageWithText(message.text);
+    setState(() {
+      _messages.add(sentMessage);
+    });
   }
 
   Future<void> getMessages(GroupChannel channel) async {
@@ -75,7 +66,7 @@ class _GroupChannelViewState extends State<GroupChannelView>
   }
 
   String titleFrom(GroupChannel channel, User currentUser) {
-    String currentUserName = SendbirdSdk().getCurrentUser().nickname;
+    String currentUserName = SendbirdSdk().currentUser.nickname;
     List<String> namesList = [
       for (final member in channel.members) member.nickname
     ];
@@ -83,7 +74,6 @@ class _GroupChannelViewState extends State<GroupChannelView>
     return namesList.join(", ");
   }
 
-  // TODO: This returns a blank widget for some reason
   Widget avatarsFrom(GroupChannel channel, User currentUser) {
     // Generate a channel image from avatars of users, excluding current user
     int crossAxisCount = 1;
@@ -109,7 +99,13 @@ class _GroupChannelViewState extends State<GroupChannelView>
             physics: NeverScrollableScrollPhysics(),
             children: [
               for (final imageUrl in imageUrls)
-                Image(image: NetworkImage(imageUrl), fit: BoxFit.cover)
+                imageUrl.isNotEmpty
+                    ? FadeInImage(
+                        image: NetworkImage(imageUrl),
+                        placeholder:
+                            AssetImage("assets/person_placeholder.jpg"),
+                        fit: BoxFit.cover)
+                    : Image(image: AssetImage("assets/person_placeholder.jpg"))
             ]),
       ),
     );
@@ -125,11 +121,11 @@ class _GroupChannelViewState extends State<GroupChannelView>
           UniversalPlatform.isAndroid == true ? false : true,
       title: Row(
         children: [
-          avatarsFrom(channel, SendbirdSdk().getCurrentUser()),
+          avatarsFrom(channel, SendbirdSdk().currentUser),
           Container(
             width: 250,
             child: Text(
-              titleFrom(channel, SendbirdSdk().getCurrentUser()),
+              titleFrom(channel, SendbirdSdk().currentUser),
               style: TextStyle(
                   color: Colors.black,
                   fontWeight: FontWeight.bold,
@@ -153,8 +149,7 @@ class _GroupChannelViewState extends State<GroupChannelView>
   }
 
   Widget body(BuildContext context) {
-    // ChatUser user = ChatUser(name: "Alpha");
-    ChatUser user = asDashChatUser(SendbirdSdk().getCurrentUser());
+    ChatUser user = asDashChatUser(SendbirdSdk().currentUser);
     return Column(children: [
       Expanded(
         child: DashChat(
@@ -197,6 +192,9 @@ class _GroupChannelViewState extends State<GroupChannelView>
     if (messages != null) {
       messages.forEach((message) {
         User user = message.sender;
+        if (user == null) {
+          return;
+        }
         result.add(
           ChatMessage(
             createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),

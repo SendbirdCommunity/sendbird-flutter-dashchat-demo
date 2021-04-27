@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:sendbirdsdk/sendbirdsdk.dart';
+import 'package:sendbird_sdk/sendbird_sdk.dart';
 import 'group_channel_view.dart';
 import 'package:intl/intl.dart';
 
@@ -30,9 +30,8 @@ class _ChannelListViewState extends State<ChannelListView>
   Future<List<GroupChannel>> getGroupChannels() async {
     try {
       final query = GroupChannelListQuery()
-        // ..includeEmptyChannel = true
-        // ..memberStateFilter = MemberStateFilter.joined
-        // ..order = GroupChannelListOrder.latestLastMessage
+        ..includeEmptyChannel = true
+        ..order = GroupChannelListOrder.latestLastMessage
         ..limit = 15;
       return await query.loadNext();
     } catch (e) {
@@ -44,21 +43,24 @@ class _ChannelListViewState extends State<ChannelListView>
   @override
   void initState() {
     super.initState();
-    SendbirdSdk().addChannelHandler(
-        'list-channel-handler-$SendbirdSdk().getCurrentUser().userId', this);
+    SendbirdSdk().addChannelEventHandler('channel_list_view', this);
     updateGroupChannels();
   }
 
   @override
+  void dispose() {
+    SendbirdSdk().removeChannelEventHandler("channel_list_view");
+    super.dispose();
+  }
+
+  @override
   void onUserJoined(GroupChannel channel, User user) {
-    if (user.userId == SendbirdSdk().getCurrentUser().userId) {
+    if (user.userId == SendbirdSdk().currentUser.userId) {
       setState(() {
         this.groupChannels = [channel, ...groupChannels];
       });
     }
   }
-
-  // TODO: channel change handler + other event handlers
 
   @override
   Widget build(BuildContext context) {
@@ -81,12 +83,13 @@ class _ChannelListViewState extends State<ChannelListView>
       actions: [
         Container(
           width: 60,
-          child: RawMaterialButton(
-              padding: EdgeInsets.fromLTRB(0, 18, 0, 18),
+          padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
+          child: TextButton(
+              // padding: EdgeInsets.fromLTRB(0, 18, 0, 18),
               onPressed: () {
                 Navigator.pushNamed(context, '/create_channel');
               },
-              shape: CircleBorder(),
+              // shape: CircleBorder(),
               child: Image.asset("assets/iconCreate@3x.png")),
         ),
       ],
@@ -124,9 +127,14 @@ class _ChannelListViewState extends State<ChannelListView>
           crossAxisCount: crossAxisCount,
           children: [
             for (final member in channel.members)
-              if (member.userId != currentUser.userId &&
-                  member.profileUrl.isNotEmpty)
-                Image(image: NetworkImage(member.profileUrl), fit: BoxFit.cover)
+              if (member.userId != currentUser.userId)
+                member.profileUrl.isNotEmpty
+                    ? FadeInImage(
+                        image: NetworkImage(member.profileUrl),
+                        placeholder:
+                            AssetImage("assets/person_placeholder.jpg"),
+                        fit: BoxFit.cover)
+                    : Image(image: AssetImage("assets/person_placeholder.jpg"))
           ],
         ),
       ),
@@ -150,12 +158,11 @@ class _ChannelListViewState extends State<ChannelListView>
                       return Padding(
                         padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
                         child: ListTile(
-                          leading: avatarsFrom(
-                              channel, SendbirdSdk().getCurrentUser()),
+                          leading:
+                              avatarsFrom(channel, SendbirdSdk().currentUser),
                           tileColor: Colors.white,
                           title: Text(
-                              titleFrom(
-                                  channel, SendbirdSdk().getCurrentUser()),
+                              titleFrom(channel, SendbirdSdk().currentUser),
                               style: TextStyle(
                                   color: Colors.black,
                                   fontWeight: FontWeight.bold)),

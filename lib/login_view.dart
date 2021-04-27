@@ -1,8 +1,7 @@
 import 'dart:async';
-
 import 'package:flutter/material.dart';
 import 'package:universal_platform/universal_platform.dart';
-import 'package:sendbirdsdk/sendbirdsdk.dart' as sb;
+import 'package:sendbird_sdk/sendbird_sdk.dart' as sb;
 
 class LoginView extends StatefulWidget {
   @override
@@ -11,7 +10,7 @@ class LoginView extends StatefulWidget {
 
 class LoginViewState extends State<LoginView> {
   final appIdController =
-      TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
+      TextEditingController(text: "YOUR_APPLICATION_ID_HERE");
   final userIdController = TextEditingController();
   bool enableSignInButton = false;
 
@@ -112,12 +111,11 @@ class LoginViewState extends State<LoginView> {
 
   Widget _signInButton(BuildContext context, bool enabled) {
     if (enabled == false) {
-      return FlatButton(
-        height: 50,
-        color: Colors.grey,
-        textColor: Colors.white,
-        disabledColor: Colors.grey,
-        disabledTextColor: Colors.black,
+      return TextButton(
+        style: ButtonStyle(
+            backgroundColor: MaterialStateProperty.all<Color>(Colors.grey),
+            foregroundColor:
+                MaterialStateProperty.all<Color>(Colors.grey[300])),
         onPressed: () {},
         child: Text(
           "Sign In",
@@ -125,12 +123,11 @@ class LoginViewState extends State<LoginView> {
         ),
       );
     }
-    return FlatButton(
-      height: 50,
-      color: Theme.of(context).buttonColor,
-      textColor: Colors.white,
-      disabledColor: Colors.grey,
-      disabledTextColor: Colors.black,
+    return TextButton(
+      style: ButtonStyle(
+          backgroundColor:
+              MaterialStateProperty.all<Color>(Theme.of(context).buttonColor),
+          foregroundColor: MaterialStateProperty.all<Color>(Colors.white)),
       onPressed: () {
         // Login with Sendbird
         connect(appIdController.text, userIdController.text).then((user) {
@@ -159,15 +156,15 @@ class LoginViewState extends State<LoginView> {
                       ],
                     ),
                   ),
-                  // title: new Text("Login Failed: Check connectivity and App Id",
-                  //     style: TextStyle(fontSize: 18)),
                   shape: RoundedRectangleBorder(
                       borderRadius: new BorderRadius.circular(15)),
                   actions: <Widget>[
-                    new FlatButton(
+                    new TextButton(
                       child: new Text("OK",
                           style: TextStyle(fontWeight: FontWeight.bold)),
-                      textColor: Theme.of(context).buttonColor,
+                      style: ButtonStyle(
+                          backgroundColor: MaterialStateProperty.all<Color>(
+                              Theme.of(context).buttonColor)),
                       onPressed: () {
                         Navigator.pop(context);
                       },

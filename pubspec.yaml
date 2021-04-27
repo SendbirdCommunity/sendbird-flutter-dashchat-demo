@@ -1,4 +1,4 @@
-name: flutter_demo
+name: sendbird_flutter_dashchat
 description: A new Flutter project.
 
 # The following line prevents the package from being accidentally published to
@@ -31,12 +31,7 @@ dependencies:
   # cupertino_icons: ^1.0.1
   # sendbirdsdk:
   #   git: https://github.com/sendbird/messaging-flutter.git
-  sendbirdsdk:
-    # path: '../messaging-flutter'
-    hosted:
-      name: sendbirdsdk
-      url: https://dl.cloudsmith.io/public/sendbird/sendbird-sdk-flutter/dart/
-    version: ^3.0.0
+  sendbird_sdk: ^3.0.11
 
 dev_dependencies:
   flutter_test:
