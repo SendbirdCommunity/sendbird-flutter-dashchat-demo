@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 import 'group_channel_view.dart';
-import 'package:intl/intl.dart';
 
 class ChannelListView extends StatefulWidget {
   @override
@@ -11,22 +9,6 @@ class ChannelListView extends StatefulWidget {
 
 class _ChannelListViewState extends State<ChannelListView>
     with ChannelEventHandler {
-  List<GroupChannel> groupChannels = [];
-  bool isLoading = false;
-
-  Future<void> updateGroupChannels() async {
-    this.isLoading = true;
-
-    List<GroupChannel> newChannels = await getGroupChannels();
-    if (newChannels == this.groupChannels) {
-      return;
-    }
-    setState(() {
-      this.isLoading = false;
-      this.groupChannels = newChannels;
-    });
-  }
-
   Future<List<GroupChannel>> getGroupChannels() async {
     try {
       final query = GroupChannelListQuery()
@@ -44,7 +26,6 @@ class _ChannelListViewState extends State<ChannelListView>
   void initState() {
     super.initState();
     SendbirdSdk().addChannelEventHandler('channel_list_view', this);
-    updateGroupChannels();
   }
 
   @override
@@ -54,18 +35,37 @@ class _ChannelListViewState extends State<ChannelListView>
   }
 
   @override
+  void onChannelChanged(BaseChannel channel) {
+    setState(() {
+      // Force the list future builder to rebuild.
+    });
+  }
+
+  @override
+  void onChannelDeleted(String channelUrl, ChannelType channelType) {
+    setState(() {
+      // Force the list future builder to rebuild.
+    });
+  }
+
+  @override
   void onUserJoined(GroupChannel channel, User user) {
-    if (user.userId == SendbirdSdk().currentUser.userId) {
-      setState(() {
-        this.groupChannels = [channel, ...groupChannels];
-      });
-    }
+    setState(() {
+      // Force the list future builder to rebuild.
+    });
+  }
+
+  @override
+  void onUserLeaved(GroupChannel channel, User user) {
+    setState(() {
+      // Force the list future builder to rebuild.
+    });
+    super.onUserLeaved(channel, user);
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.grey[200],
       appBar: navigationBar(),
       body: body(context),
     );
@@ -73,147 +73,61 @@ class _ChannelListViewState extends State<ChannelListView>
 
   Widget navigationBar() {
     return AppBar(
-      leading: BackButton(color: Theme.of(context).primaryColor),
-      toolbarHeight: 65,
-      elevation: 0,
+      automaticallyImplyLeading: true,
       backgroundColor: Colors.white,
-      automaticallyImplyLeading:
-          UniversalPlatform.isAndroid == true ? false : true,
-      title: Text('Channels', style: TextStyle(color: Colors.black)),
+      centerTitle: true,
+      leading: BackButton(color: Theme.of(context).primaryColor),
+      title: Text(
+        'Channels',
+        style: TextStyle(color: Colors.black),
+      ),
       actions: [
         Container(
           width: 60,
           padding: EdgeInsets.fromLTRB(0, 10, 0, 10),
           child: TextButton(
-              // padding: EdgeInsets.fromLTRB(0, 18, 0, 18),
               onPressed: () {
                 Navigator.pushNamed(context, '/create_channel');
               },
-              // shape: CircleBorder(),
               child: Image.asset("assets/iconCreate@3x.png")),
         ),
       ],
-      centerTitle: true,
-    );
-  }
-
-  String titleFrom(GroupChannel channel, User currentUser) {
-    // List of channel member names, excluding the current user
-    List<String> namesList = [
-      for (final member in channel.members)
-        if (member.userId != currentUser.userId) member.nickname
-    ];
-    return namesList.join(", ");
-  }
-
-  Widget avatarsFrom(GroupChannel channel, User currentUser) {
-    // Generate a channel image from avatars of users, excluding current user
-    int crossAxisCount = 1;
-    if (channel.memberCount > 3) {
-      crossAxisCount = 2;
-    } else {
-      (channel.memberCount / 2).round();
-    }
-    return Container(
-      width: 40,
-      height: 40,
-      child: RawMaterialButton(
-        shape: CircleBorder(),
-        clipBehavior: Clip.hardEdge,
-        onPressed: () {},
-        child: GridView.count(
-          physics: NeverScrollableScrollPhysics(),
-          reverse: true,
-          crossAxisCount: crossAxisCount,
-          children: [
-            for (final member in channel.members)
-              if (member.userId != currentUser.userId)
-                member.profileUrl.isNotEmpty
-                    ? FadeInImage(
-                        image: NetworkImage(member.profileUrl),
-                        placeholder:
-                            AssetImage("assets/person_placeholder.jpg"),
-                        fit: BoxFit.cover)
-                    : Image(image: AssetImage("assets/person_placeholder.jpg"))
-          ],
-        ),
-      ),
     );
   }
 
   Widget body(BuildContext context) {
-    return Column(
-      children: [
-        !isLoading
-            ? Expanded(
-                child: ListView.builder(
-                    itemCount: groupChannels.length,
-                    itemBuilder: (context, index) {
-                      GroupChannel channel = groupChannels[index];
-                      DateTime lastMessageDate =
-                          DateTime.fromMillisecondsSinceEpoch(
-                              channel?.lastMessage?.createdAt ?? 0);
-                      String lastMessageDateString =
-                          DateFormat("E").format(lastMessageDate);
-                      return Padding(
-                        padding: const EdgeInsets.fromLTRB(0, 2, 0, 0),
-                        child: ListTile(
-                          leading:
-                              avatarsFrom(channel, SendbirdSdk().currentUser),
-                          tileColor: Colors.white,
-                          title: Text(
-                              titleFrom(channel, SendbirdSdk().currentUser),
-                              style: TextStyle(
-                                  color: Colors.black,
-                                  fontWeight: FontWeight.bold)),
-                          subtitle: Text(channel?.lastMessage?.message ?? ''),
-                          onTap: () {
-                            gotoChannel(channel.channelUrl);
-                          },
-                          trailing: Column(
-                            mainAxisAlignment: MainAxisAlignment.spaceEvenly,
-                            children: [
-                              Text(lastMessageDateString),
-                              ConstrainedBox(
-                                constraints:
-                                    BoxConstraints(maxHeight: 20, maxWidth: 40),
-                                child: TextField(
-                                  textAlign: TextAlign.center,
-                                  enabled: false,
-                                  enableInteractiveSelection: false,
-                                  decoration: channel.unreadMessageCount == 0
-                                      ? null
-                                      : new InputDecoration(
-                                          border: new OutlineInputBorder(
-                                            borderRadius:
-                                                const BorderRadius.all(
-                                              const Radius.circular(20.0),
-                                            ),
-                                          ),
-                                          filled: true,
-                                          hintStyle: new TextStyle(
-                                              color: Colors.white, fontSize: 8),
-                                          hintText:
-                                              "${channel.unreadMessageCount}",
-                                          fillColor:
-                                              Theme.of(context).primaryColor),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      );
-                    }))
-            : Column(children: [
-                Container(height: 100),
-                Center(child: CircularProgressIndicator())
-              ])
-      ],
+    return FutureBuilder(
+      future: getGroupChannels(),
+      builder: (context, snapshot) {
+        if (snapshot.hasData == false || snapshot.data == null) {
+          // Nothing to display yet - good place for a loading indicator
+          return Container();
+        }
+        List<GroupChannel> channels = snapshot.data;
+        return ListView.builder(
+            itemCount: channels.length,
+            itemBuilder: (context, index) {
+              GroupChannel channel = channels[index];
+              return ListTile(
+                // Display all channel members as the title
+                title: Text(
+                  [for (final member in channel.members) member.nickname]
+                      .join(", "),
+                ),
+                // Display the last message presented
+                subtitle: Text(channel?.lastMessage?.message ?? ''),
+                onTap: () {
+                  gotoChannel(channel.channelUrl);
+                },
+              );
+            });
+      },
     );
   }
 
   void gotoChannel(String channelUrl) {
     GroupChannel.getChannel(channelUrl).then((channel) {
+      Navigator.pushNamed(context, '/channel_list');
       Navigator.push(
         context,
         MaterialPageRoute(

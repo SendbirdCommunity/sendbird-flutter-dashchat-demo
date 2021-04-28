@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:universal_platform/universal_platform.dart';
 import 'package:dash_chat/dash_chat.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 import 'dart:async';
 import 'package:intl/intl.dart';
 
 class GroupChannelView extends StatefulWidget {
-  GroupChannel groupChannel;
+  final GroupChannel groupChannel;
   GroupChannelView({Key key, @required this.groupChannel}) : super(key: key);
 
   @override
@@ -15,7 +14,6 @@ class GroupChannelView extends StatefulWidget {
 
 class _GroupChannelViewState extends State<GroupChannelView>
     with ChannelEventHandler {
-  final GlobalKey<DashChatState> _chatViewKey = GlobalKey<DashChatState>();
   List<BaseMessage> _messages = [];
   @override
   void initState() {
@@ -30,18 +28,10 @@ class _GroupChannelViewState extends State<GroupChannelView>
     super.dispose();
   }
 
-  // Sendbird Channel Event Handling
   @override
   onMessageReceived(channel, message) {
     setState(() {
       _messages.add(message);
-    });
-  }
-
-  void onSend(ChatMessage message) async {
-    var sentMessage = widget.groupChannel.sendUserMessageWithText(message.text);
-    setState(() {
-      _messages.add(sentMessage);
     });
   }
 
@@ -65,129 +55,60 @@ class _GroupChannelViewState extends State<GroupChannelView>
     );
   }
 
-  String titleFrom(GroupChannel channel, User currentUser) {
-    String currentUserName = SendbirdSdk().currentUser.nickname;
-    List<String> namesList = [
-      for (final member in channel.members) member.nickname
-    ];
-    namesList.remove(currentUserName);
-    return namesList.join(", ");
-  }
-
-  Widget avatarsFrom(GroupChannel channel, User currentUser) {
-    // Generate a channel image from avatars of users, excluding current user
-    int crossAxisCount = 1;
-    if (channel.memberCount > 3) {
-      crossAxisCount = 2;
-    } else {
-      (channel.memberCount / 2).round();
-    }
-    List<String> imageUrls = [
-      for (final member in channel.members) member.profileUrl
-    ];
-    imageUrls.remove(currentUser.profileUrl);
-    return RawMaterialButton(
-      shape: CircleBorder(),
-      clipBehavior: Clip.hardEdge,
-      onPressed: () {},
-      child: Container(
-        width: 60,
-        height: 60,
-        child: GridView.count(
-            reverse: true,
-            crossAxisCount: crossAxisCount,
-            physics: NeverScrollableScrollPhysics(),
-            children: [
-              for (final imageUrl in imageUrls)
-                imageUrl.isNotEmpty
-                    ? FadeInImage(
-                        image: NetworkImage(imageUrl),
-                        placeholder:
-                            AssetImage("assets/person_placeholder.jpg"),
-                        fit: BoxFit.cover)
-                    : Image(image: AssetImage("assets/person_placeholder.jpg"))
-            ]),
-      ),
-    );
-  }
-
   Widget navigationBar(GroupChannel channel) {
     return AppBar(
-      leading: BackButton(color: Theme.of(context).buttonColor),
-      toolbarHeight: 65,
-      elevation: 0,
+      automaticallyImplyLeading: true,
       backgroundColor: Colors.white,
-      automaticallyImplyLeading:
-          UniversalPlatform.isAndroid == true ? false : true,
-      title: Row(
-        children: [
-          avatarsFrom(channel, SendbirdSdk().currentUser),
-          Container(
-            width: 250,
-            child: Text(
-              titleFrom(channel, SendbirdSdk().currentUser),
-              style: TextStyle(
-                  color: Colors.black,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 18),
-              overflow: TextOverflow.ellipsis,
-              maxLines: 1,
-            ),
-          )
-        ],
-      ),
-      // actions: [
-      // TODO: Add a channel info page
-      // IconButton(
-      //   icon: Icon(Icons.info_outline_rounded),
-      //   color: Theme.of(context).buttonColor,
-      //   onPressed: () {},
-      // )
-      // ],
       centerTitle: false,
+      leading: BackButton(color: Theme.of(context).buttonColor),
+      title: Container(
+        width: 250,
+        child: Text(
+          [for (final member in channel.members) member.nickname].join(", "),
+          style: TextStyle(color: Colors.black),
+        ),
+      ),
     );
   }
 
   Widget body(BuildContext context) {
     ChatUser user = asDashChatUser(SendbirdSdk().currentUser);
-    return Column(children: [
-      Expanded(
-        child: DashChat(
-          dateFormat: DateFormat("E, MMM d"),
-          // timeFormat: DateFormat('HH:mm'),
-          timeFormat: DateFormat.jm(),
-          showUserAvatar: true,
-          onPressAvatar: (ChatUser user) {
-            // If wanting to trigger anything from here
-          },
-          key: Key(widget.groupChannel.channelUrl),
-          onSend: (ChatMessage message) async {
-            onSend(message);
-          },
-          sendOnEnter: true,
-          textInputAction: TextInputAction.send,
-          user: user,
-          messages: asDashChatMessages(_messages),
-          inputDecoration:
-              InputDecoration.collapsed(hintText: "Type a message here..."),
-          messageDecorationBuilder: (ChatMessage msg, bool isUser) {
-            return BoxDecoration(
-              borderRadius: BorderRadius.all(Radius.circular(20.0)),
-              color: isUser
-                  ? Theme.of(context).primaryColor
-                  : Colors.grey[200], // example
-            );
-          },
-        ),
+    return Padding(
+      // A little breathing room for devices with no home button.
+      padding: const EdgeInsets.fromLTRB(8, 8, 8, 40),
+      child: DashChat(
+        dateFormat: DateFormat("E, MMM d"),
+        timeFormat: DateFormat.jm(),
+        showUserAvatar: true,
+        key: Key(widget.groupChannel.channelUrl),
+        onSend: (ChatMessage message) async {
+          var sentMessage =
+              widget.groupChannel.sendUserMessageWithText(message.text);
+          setState(() {
+            _messages.add(sentMessage);
+          });
+        },
+        sendOnEnter: true,
+        textInputAction: TextInputAction.send,
+        user: user,
+        messages: asDashChatMessages(_messages),
+        inputDecoration:
+            InputDecoration.collapsed(hintText: "Type a message here..."),
+        messageDecorationBuilder: (ChatMessage msg, bool isUser) {
+          return BoxDecoration(
+            borderRadius: BorderRadius.all(Radius.circular(20.0)),
+            color: isUser
+                ? Theme.of(context).primaryColor
+                : Colors.grey[200], // example
+          );
+        },
       ),
-      // Spacer for devices with no home button
-      Container(
-        height: 40,
-      ),
-    ]);
+    );
   }
 
   List<ChatMessage> asDashChatMessages(List<BaseMessage> messages) {
+    // BaseMessage is a Sendbird class
+    // ChatMessage is a DashChat class
     List<ChatMessage> result = [];
     if (messages != null) {
       messages.forEach((message) {
@@ -199,11 +120,7 @@ class _GroupChannelViewState extends State<GroupChannelView>
           ChatMessage(
             createdAt: DateTime.fromMillisecondsSinceEpoch(message.createdAt),
             text: message.message,
-            user: ChatUser(
-              name: user.nickname,
-              uid: user.userId,
-              avatar: user.profileUrl,
-            ),
+            user: asDashChatUser(user),
           ),
         );
       });
@@ -213,6 +130,9 @@ class _GroupChannelViewState extends State<GroupChannelView>
 
   ChatUser asDashChatUser(User user) {
     return ChatUser(
-        name: user.nickname, uid: user.userId, avatar: user.profileUrl);
+      name: user.nickname,
+      uid: user.userId,
+      avatar: user.profileUrl,
+    );
   }
 }

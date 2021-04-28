@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:sendbird_flutter_dashchat/group_channel_view.dart';
-import 'package:universal_platform/universal_platform.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 
 class CreateChannelView extends StatefulWidget {
@@ -8,61 +7,28 @@ class CreateChannelView extends StatefulWidget {
   _CreateChannelViewState createState() => _CreateChannelViewState();
 }
 
-class UserSelection {
-  bool isSelected = false;
-  User user;
-  UserSelection(this.user);
-  @override
-  String toString() {
-    return "UserSelection: {isSelected: $isSelected, user: $user}";
-  }
-}
-
-List<UserSelection> selectedUsersFrom(List<User> users) {
-  List<UserSelection> result = [];
-  users.forEach((user) {
-    result.add(new UserSelection(user));
-  });
-  return result;
-}
-
 class _CreateChannelViewState extends State<CreateChannelView> {
-  List<UserSelection> selections = [];
+  final Set<User> _selectedUsers = {};
+  final List<User> _availableUsers = [];
 
-  Future<void> updateUsers() async {
-    List<UserSelection> newSelections = await getUsers();
-    if (newSelections == this.selections) {
-      return;
-    }
-    setState(() {
-      this.selections = newSelections;
-    });
-  }
-
-  Future<List<UserSelection>> getUsers() async {
+  Future<List<User>> getUsers() async {
     try {
       final query = ApplicationUserListQuery();
       List<User> users = await query.loadNext();
-      return selectedUsersFrom(users);
+      return users;
     } catch (e) {
       print('create_channel_view: getUsers: ERROR: $e');
       return [];
     }
   }
 
-  Future<GroupChannel> createChannel() async {
+  Future<GroupChannel> createChannel(List<String> userIds) async {
     try {
-      final userIds = this
-          .selections
-          .where((selection) => selection.isSelected)
-          .map((selection) {
-        return selection.user.userId;
-      }).toList();
       final params = GroupChannelParams()..userIds = userIds;
       final channel = await GroupChannel.createChannel(params);
       return channel;
     } catch (e) {
-      print('create_channel_view: createChannel: ERROR: $e');
+      print('createChannel: ERROR: $e');
       throw e;
     }
   }
@@ -70,13 +36,20 @@ class _CreateChannelViewState extends State<CreateChannelView> {
   @override
   void initState() {
     super.initState();
-    updateUsers();
+    getUsers().then((users) {
+      setState(() {
+        _availableUsers.clear();
+        _availableUsers.addAll(users);
+      });
+    }).catchError((e) {
+      print('initState: ERROR: $e');
+    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      // backgroundColor: Colors.white,
       appBar: navigationBar(),
       body: body(context),
     );
@@ -84,24 +57,27 @@ class _CreateChannelViewState extends State<CreateChannelView> {
 
   Widget navigationBar() {
     return AppBar(
-      leading: BackButton(color: Theme.of(context).buttonColor),
-      toolbarHeight: 65,
-      elevation: 0,
+      automaticallyImplyLeading: true,
       backgroundColor: Colors.white,
-      automaticallyImplyLeading:
-          UniversalPlatform.isAndroid == true ? false : true,
-      title: Text('Select members', style: TextStyle(color: Colors.black)),
+      centerTitle: true,
+      leading: BackButton(color: Theme.of(context).buttonColor),
+      title: Text(
+        'Select members',
+        style: TextStyle(color: Colors.black),
+      ),
       actions: [
         TextButton(
           style: ButtonStyle(
               foregroundColor: MaterialStateProperty.all<Color>(
                   Theme.of(context).buttonColor)),
           onPressed: () {
-            if (!isAnyoneElseSelected()) {
-              // Don't create a channel if no other user selected
+            if (_selectedUsers.toList().length < 1) {
+              // Don't create a channel if there isn't another user selected
               return;
             }
-            createChannel().then((channel) {
+            createChannel(
+                    [for (final user in _selectedUsers.toList()) user.userId])
+                .then((channel) {
               Navigator.pushReplacement(
                 context,
                 MaterialPageRoute(
@@ -109,88 +85,58 @@ class _CreateChannelViewState extends State<CreateChannelView> {
                 ),
               );
             }).catchError((error) {
-              return showDialog<void>(
-                  context: context,
-                  barrierDismissible: true,
-                  builder: (BuildContext context) {
-                    return AlertDialog(
-                      title: new Text("Channel Creation Error: $error"),
-                      shape: RoundedRectangleBorder(
-                          borderRadius: new BorderRadius.circular(15)),
-                      actions: <Widget>[
-                        new TextButton(
-                          style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all<Color>(
-                                  Theme.of(context).buttonColor),
-                              foregroundColor: MaterialStateProperty.all<Color>(
-                                  Colors.white)),
-                          child: new Text("Ok"),
-                          onPressed: () {
-                            Navigator.pop(context);
-                          },
-                        ),
-                      ],
-                    );
-                  });
+              print(
+                  'create_channel_view: navigationBar: createChannel: ERROR: $error');
             });
           },
           child: Text(
             "Create",
-            style: TextStyle(fontSize: 20.0),
+            style: TextStyle(
+              fontSize: 20.0,
+              color: Theme.of(context).primaryColor,
+            ),
           ),
         )
       ],
-      centerTitle: true,
     );
-  }
-
-  bool isAnyoneElseSelected() {
-    return this.selections.where((item) => item.isSelected).toList().length > 0;
   }
 
   Widget body(BuildContext context) {
-    return Column(
-      children: [
-        Expanded(
-          child: ListView.builder(
-              itemCount: selections.length,
-              itemBuilder: (context, index) {
-                UserSelection selection = selections[index];
-
-                return CheckboxListTile(
-                  title: Text(
-                      selection.user.nickname.isEmpty
-                          ? selection.user.userId
-                          : selection.user.nickname,
-                      style: TextStyle(color: Colors.black)),
-                  controlAffinity: ListTileControlAffinity.platform,
-                  value: SendbirdSdk().currentUser.userId ==
-                          selection.user.userId ||
-                      selection.isSelected,
-                  activeColor: Theme.of(context).primaryColor,
-                  onChanged: (bool value) {
-                    //Display chat view
-                    setState(() {
-                      selection.isSelected = !selection.isSelected;
-                    });
-                  },
-                  secondary: selection.user.profileUrl.isEmpty
-                      ? CircleAvatar(
-                          child: Text(
-                          (selection.user.nickname.isEmpty
-                                  ? selection.user.userId
-                                  : selection.user.nickname)
-                              .substring(0, 1)
-                              .toUpperCase(),
-                        ))
-                      : CircleAvatar(
-                          backgroundImage:
-                              NetworkImage(selection.user.profileUrl),
-                        ),
-                );
-              }),
-        ),
-      ],
-    );
+    return ListView.builder(
+        itemCount: _availableUsers.length,
+        itemBuilder: (context, index) {
+          User user = _availableUsers[index];
+          return CheckboxListTile(
+            title: Text(user.nickname.isEmpty ? user.userId : user.nickname,
+                style: TextStyle(color: Colors.black)),
+            controlAffinity: ListTileControlAffinity.platform,
+            value: _selectedUsers.contains(user),
+            // value: SendbirdSdk().currentUser.userId == user.userId,
+            activeColor: Theme.of(context).primaryColor,
+            onChanged: (bool value) {
+              // Using a set to store which users we want to create
+              // a channel with.
+              setState(() {
+                if (value) {
+                  _selectedUsers.add(user);
+                } else {
+                  _selectedUsers.remove(user);
+                }
+                print(
+                    'create_channel_view: on change for: ${user.nickname} _selectedUsers: $_selectedUsers');
+              });
+            },
+            secondary: user.profileUrl.isEmpty
+                ? CircleAvatar(
+                    child: Text(
+                    (user.nickname.isEmpty ? user.userId : user.nickname)
+                        .substring(0, 1)
+                        .toUpperCase(),
+                  ))
+                : CircleAvatar(
+                    backgroundImage: NetworkImage(user.profileUrl),
+                  ),
+          );
+        });
   }
 }

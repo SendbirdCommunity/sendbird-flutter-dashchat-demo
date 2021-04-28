@@ -1,7 +1,6 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:universal_platform/universal_platform.dart';
-import 'package:sendbird_sdk/sendbird_sdk.dart' as sb;
+import 'package:sendbird_sdk/sendbird_sdk.dart';
 
 class LoginView extends StatefulWidget {
   @override
@@ -9,20 +8,12 @@ class LoginView extends StatefulWidget {
 }
 
 class LoginViewState extends State<LoginView> {
-  final appIdController =
-      TextEditingController(text: "YOUR_APPLICATION_ID_HERE");
-  final userIdController = TextEditingController();
-  bool enableSignInButton = false;
-
-  bool shouldEnableSignInButton() {
-    if (appIdController.text == null || appIdController.text == "") {
-      return false;
-    }
-    if (userIdController.text == null || userIdController.text == "") {
-      return false;
-    }
-    return true;
-  }
+  final _appIdController =
+      TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
+  // final _appIdController =
+  //     TextEditingController(text: "YOUR_APPLICATION_ID_HERE");
+  final _userIdController = TextEditingController();
+  bool _enableSignInButton = false;
 
   @override
   Widget build(BuildContext context) {
@@ -37,8 +28,8 @@ class LoginViewState extends State<LoginView> {
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
-      automaticallyImplyLeading:
-          UniversalPlatform.isAndroid == true ? false : true,
+      // Disable the back button for Android deployments
+      automaticallyImplyLeading: true,
       title: Text('Sendbird Sample', style: TextStyle(color: Colors.black)),
       actions: [],
       centerTitle: true,
@@ -62,10 +53,10 @@ class LoginViewState extends State<LoginView> {
                 style: Theme.of(context).textTheme.headline6),
             SizedBox(height: 40),
             TextField(
-              controller: appIdController,
+              controller: _appIdController,
               onChanged: (value) {
                 setState(() {
-                  enableSignInButton = shouldEnableSignInButton();
+                  _enableSignInButton = _shouldEnableSignInButton();
                 });
               },
               decoration: InputDecoration(
@@ -75,17 +66,17 @@ class LoginViewState extends State<LoginView> {
                   fillColor: Colors.grey[200],
                   suffixIcon: IconButton(
                     onPressed: () {
-                      appIdController.clear();
+                      _appIdController.clear();
                     },
                     icon: Icon(Icons.clear),
                   )),
             ),
             SizedBox(height: 10),
             TextField(
-              controller: userIdController,
+              controller: _userIdController,
               onChanged: (value) {
                 setState(() {
-                  enableSignInButton = shouldEnableSignInButton();
+                  _enableSignInButton = _shouldEnableSignInButton();
                 });
               },
               decoration: InputDecoration(
@@ -95,7 +86,7 @@ class LoginViewState extends State<LoginView> {
                   fillColor: Colors.grey[200],
                   suffixIcon: IconButton(
                     onPressed: () {
-                      userIdController.clear();
+                      _userIdController.clear();
                     },
                     icon: Icon(Icons.clear),
                   )),
@@ -103,14 +94,25 @@ class LoginViewState extends State<LoginView> {
             SizedBox(height: 30),
             FractionallySizedBox(
               widthFactor: 1,
-              child: _signInButton(context, enableSignInButton),
+              child: _signInButton(context, _enableSignInButton),
             )
           ],
         ));
   }
 
+  bool _shouldEnableSignInButton() {
+    if (_appIdController.text.isEmpty) {
+      return false;
+    }
+    if (_userIdController.text.isEmpty) {
+      return false;
+    }
+    return true;
+  }
+
   Widget _signInButton(BuildContext context, bool enabled) {
     if (enabled == false) {
+      // Disable the sign in button if required data not entered
       return TextButton(
         style: ButtonStyle(
             backgroundColor: MaterialStateProperty.all<Color>(Colors.grey),
@@ -125,53 +127,14 @@ class LoginViewState extends State<LoginView> {
     }
     return TextButton(
       style: ButtonStyle(
-          backgroundColor:
-              MaterialStateProperty.all<Color>(Theme.of(context).buttonColor),
+          backgroundColor: MaterialStateProperty.all<Color>(Color(0xff742DDD)),
           foregroundColor: MaterialStateProperty.all<Color>(Colors.white)),
       onPressed: () {
         // Login with Sendbird
-        connect(appIdController.text, userIdController.text).then((user) {
+        connect(_appIdController.text, _userIdController.text).then((user) {
           Navigator.pushNamed(context, '/channel_list');
         }).catchError((error) {
-          print('login_view.dart: _signInButton: ERROR: $error');
-          return showDialog<void>(
-              context: context,
-              barrierDismissible: true,
-              builder: (BuildContext context) {
-                return AlertDialog(
-                  title: RichText(
-                    textAlign: TextAlign.left,
-                    softWrap: true,
-                    text: TextSpan(
-                      text: 'Login Failed:  ',
-                      style: TextStyle(
-                          fontSize: 18,
-                          color: Colors.red,
-                          fontWeight: FontWeight.bold),
-                      children: <TextSpan>[
-                        TextSpan(
-                            text: 'Check connectivity and App Id',
-                            style:
-                                TextStyle(color: Colors.black, fontSize: 16)),
-                      ],
-                    ),
-                  ),
-                  shape: RoundedRectangleBorder(
-                      borderRadius: new BorderRadius.circular(15)),
-                  actions: <Widget>[
-                    new TextButton(
-                      child: new Text("OK",
-                          style: TextStyle(fontWeight: FontWeight.bold)),
-                      style: ButtonStyle(
-                          backgroundColor: MaterialStateProperty.all<Color>(
-                              Theme.of(context).buttonColor)),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
-                    ),
-                  ],
-                );
-              });
+          print('login_view: _signInButton: ERROR: $error');
         });
       },
       child: Text(
@@ -181,9 +144,10 @@ class LoginViewState extends State<LoginView> {
     );
   }
 
-  Future<sb.User> connect(String appId, String userId) async {
+  Future<User> connect(String appId, String userId) async {
+    // Init Sendbird SDK and connect with current user id
     try {
-      final sendbird = sb.SendbirdSdk(appId: appId);
+      final sendbird = SendbirdSdk(appId: appId);
       final user = await sendbird.connect(userId);
       return user;
     } catch (e) {
