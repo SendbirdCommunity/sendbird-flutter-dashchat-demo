@@ -1,6 +1,13 @@
 # sendbird-flutter-dashchat
 
-This is a sample application showing how to get started with [Sendbird](https://sendbird.com)'s Flutter SDK integrated with [DashChat](https://pub.dev/packages/dash_chat), a chat UI only library.
+## Introduction
+This is a sample application showing how to integrate [Sendbird](https://sendbird.com)'s Flutter SDK with [DashChat](https://pub.dev/packages/dash_chat), a chat UI library.
+
+## Requirements
+- Dart 2.10.4
+- Flutter 1.22.x or higher
+
+To run the demo you will need an active Sendbird application id and at least two users. See [this introductory video](https://www.youtube.com/watch?v=QCS0eyO2Q3U) for instructions on how to create a new application and users.
 
 ## Setup
 See [Flutter install instructions](https://flutter.dev/docs/get-started/install) for your platform and preferred IDE.
