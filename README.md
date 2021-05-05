@@ -1,4 +1,6 @@
 # sendbird-flutter-dashchat
+![Platform](https://img.shields.io/badge/platform-flutter-blue.svg)
+![Languages](https://img.shields.io/badge/language-dart-blue.svg)
 
 ## Introduction
 This is a sample application showing how to integrate [Sendbird](https://sendbird.com)'s Flutter SDK with [DashChat](https://pub.dev/packages/dash_chat), a chat UI library.
