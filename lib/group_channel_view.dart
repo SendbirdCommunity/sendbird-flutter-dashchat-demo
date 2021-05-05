@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:dash_chat/dash_chat.dart';
 import 'package:sendbird_sdk/sendbird_sdk.dart';
 import 'dart:async';
-import 'package:intl/intl.dart';
 
 class GroupChannelView extends StatefulWidget {
   final GroupChannel groupChannel;
