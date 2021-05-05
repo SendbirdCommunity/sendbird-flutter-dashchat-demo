@@ -9,9 +9,7 @@ class LoginView extends StatefulWidget {
 
 class LoginViewState extends State<LoginView> {
   final _appIdController =
-      TextEditingController(text: "D56438AE-B4DB-4DC9-B440-E032D7B35CEB");
-  // final _appIdController =
-  //     TextEditingController(text: "YOUR_APPLICATION_ID_HERE");
+      TextEditingController(text: "YOUR_APPLICATION_ID_HERE");
   final _userIdController = TextEditingController();
   bool _enableSignInButton = false;
 
@@ -28,7 +26,6 @@ class LoginViewState extends State<LoginView> {
       toolbarHeight: 65,
       elevation: 0,
       backgroundColor: Colors.white,
-      // Disable the back button for Android deployments
       automaticallyImplyLeading: true,
       title: Text('Sendbird Sample', style: TextStyle(color: Colors.black)),
       actions: [],
